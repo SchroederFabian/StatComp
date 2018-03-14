@@ -3,9 +3,9 @@ title: "107.106 AKSTA Statistical Computing"
 subtitle: "Data Objects"
 author: "Fabian Schroeder"
 date: "SS 2018"
-output: slidy_presentation
+#output: slidy_presentation
 
-#output: html_document
+output: html_document
 ---
 
 ***
