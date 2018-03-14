@@ -1,0 +1,380 @@
+---
+title: "107.106 AKSTA Statistical Computing"
+subtitle: "Data Objects"
+author: "Fabian Schroeder"
+date: "SS 2018"
+output: slidy_presentation
+
+#output: html_document
+---
+
+***
+
+\Large
+
+> \ *Everything that exists is an object.*    
+> \ *Everything that happens is a function call.*  
+> \ *(John Chambers)*
+
+\normalsize  
+
+***  
+
+
+## Data Objects
+
+<style>
+slides > slide { overflow: scroll; }
+
+</style>
+
+In every computer language variables provide a means of accessing the data stored in memory. R does not provide direct access to the computer’s memory but rather provides a number of specialized data structures we will refer to as objects. These objects are referred to through symbols or variables.
+
+There are many different objects. In this lesson we will focus on those kinds that are ment to store data: *vectors*, *matrices*, *arrays*, *lists*, and *data frames*. These data objects differ with respect to their dimensionality and whether they are homogenous or heterogenous. 
+
+|  | homogenous | heterogenous |
+| -- | ---- | ----- |
+| 1D | vector | list |
+| 2D | matrix | data frame|
+| nD | array | |
+
+
+For every object we will learn how initialize it, fill it with data, index it, and learn about its *attributes*.
+
+
+## Vectors
+
+Vectors are one-dimensional data structures. In this section we will cover *atomic vectors*, where all elements must be of the same *type*.
+
+### Initialize and Create Vectors
+
+```{r collapse = TRUE}
+# initialize a vector
+vec_num <- vector(mode = "numeric", length = 7)
+vec_log <- vector(mode = "logical", length = 7)
+vec_chr <- vector(mode = "character", length = 7)
+```
+
+In order to obtain the default values of the vector() function one can simply print them to the console
+```{r collapse = TRUE}
+vec_num
+vec_log
+vec_chr
+```
+
+The following functions generate vectors and fill them according to some rule.
+```{r collapse = TRUE}
+# concatenate c()
+vec_chr <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+vec_int <- c(1L, 0L, 1L, 2L, 3L, 0L, 2L)
+vec_dou <- c(1.0, 0, 1.0, 2.0, 3.0, 0, 2.0)
+is.vector(vec_int)
+
+# seqence seq()
+vec_num <- seq(1,7)
+is.vector(vec_num)
+
+# repeat rep()
+vec_log <- rep(TRUE, 7)
+is.vector(vec_log)
+```
+
+Vectors have three different properties: a *type* (`typeof()`), a length (`length()`), and its attributes including the names. R has six basic (‘atomic’) vector types: logical, integer, double, string (or character).  
+
+```{r collapse = TRUE}
+typeof(vec_log)
+typeof(vec_int)
+typeof(vec_dou)
+
+length(vec_num)
+
+names(vec_num) <- vec_chr
+attributes(vec_num)
+
+# use the structure function
+str(vec_num)
+str(vec_int)
+
+```
+
+For programming also the following functions can be used to check the type of a vector: `is.logical()`, `is.character()`, `is.numeric()`, `is.double()`, `is.atomic()`, `is.numeric()` .
+
+
+
+### Indexing
+
+In R there is a wide range of indexing options. Even for atomic vectors there  are **six** ways to subset:
+
+1. **positive indexing** using positive integers.
+2. **negative indexing** using negative integers.
+3. **logical indexing** using logical vectors.
+4. **named indexing** using character vectors.
+5. **blank** indexing.
+6. **zero** indexing.
+
+```{r collapse = TRUE}
+# positive indexing
+vec_num[2]
+
+# positive indexing using a vector
+vec_num[c(1,3)]
+
+# negative indexing
+vec_num[-c(2,4)]
+
+# named indexing
+vec_num["Wednesday"]
+
+# blank indexing
+vec_num[]
+
+# zero indexing
+vec_num[0]
+
+```
+
+Logical indexing is expecially useful because we can use logical operators to subset vectors.
+
+```{r collapse = TRUE}
+vec_num[c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)]
+
+vec_num[vec_num == 0]
+
+vec_num[vec_num == 2]
+```
+
+
+## Matrices and Arrays
+
+Matrices and Data Frames are generalisation of vectors in the sense that they have two or more dimensions. They are initialized by means of the `matrix()` and the `array()` functions. 
+
+```{r collapse = TRUE}
+mat <- matrix(1:6, ncol=3, nrow=2)
+mat
+
+arr <- array(1:24, dim=c(3,4,2))
+arr
+
+```
+
+Matrices and Arrays have different attributes
+
+
+
+
+
+Subsetting of higher dimensional objects can be done in three ways:
+
+1. using multiple vectors.
+2. using a single vector.
+3. using matrices
+
+Subsetting multi-dimensional structures generally follows the same rules as single-dimensional
+indexing for each index variable, with the relevant component of dimnames taking the place of
+names. A couple of special rules apply, though:
+Normally, a structure is accessed using the number of indices corresponding to its dimension.
+It is however also possible to use a single index in which case the dim and dimnames attributes
+are disregarded and the result is effectively that of c(m)[i]. Notice that m[1] is usually very
+different from m[1, ] or m[, 1].
+It is possible to use a matrix of integers as an index. In this case, the number of columns
+of the matrix should match the number of dimensions of the structure, and the result will be a
+vector with length as the number of rows of the matrix. The following example shows how to
+extract the elements m[1, 1] and m[2, 2] in one operation.
+
+```{r collapse = TRUE}
+mat[c(1,4,6)]
+
+mat[1,3]
+
+mat[1,]
+
+mat[,2]
+
+mat[matrix(rep(c(TRUE, FALSE), 3), nrow = 2)]
+
+arr[c(2,12,24)]
+
+arr[1,2,1]
+
+arr[1,,]
+
+arr[array(rep(c(TRUE, FALSE), 12), dim = c(3,4,2) )]
+
+```
+
+Matrices have a few important attributes.
+
+```{r collapse = TRUE} 
+ncol(mat)
+nrow(mat)
+
+colnames(mat) <- LETTERS[1:3]
+rownames(mat) <- letters[1:2]
+mat
+
+# you can also use
+dimnames(mat)
+
+```
+
+The counterpart of length for an array is dim and the counterpart
+of names is dimnames which is list of character vectors of
+appropriate length.
+
+```{r collapse = TRUE}
+dim(arr)
+dimnames(arr) <- list( c("r1", "r2", "r3"), c("c1", "c2", "c3", "c4"),c("a1", "a2"))
+
+arr
+```
+
+The extension for `c()` for matrices is `cbind()` and `rbind()`. Similarly, the package abind provides the function `abind()`. For transposing a matrix in R the function `t()` is available and for the array counterpart the function aperm. To check if an object is a matrix / array the functions `is.matrix()` / `is.array()` can be used. Similarly coercion to matrices and arrays can be performed using `as.matrix()` / `as.array()`.
+
+
+## Lists
+
+Lists (“generic vectors”) are another kind of "one-dimensional" data objects. However, while in an atomic vector all elements must be of the same *type*, a list can contain elements of different types. In fact, lists have elements, each of whichcan contain any type of R object, i.e. the elements of a list do not have to be of the same type. A list can even contain vectors or lists.
+
+A list is initialized by the `list()` function.
+
+```{r collapse = TRUE}
+# initialize a list
+lst <- list("Logical_Vector" = vec_log, 
+             "Integer_Vector" = vec_int, 
+             "Double_Vector" = vec_dou,
+             "Character_Vector" = vec_chr, 
+             "Result" = TRUE)
+
+
+```
+
+Use the structure funtion to get a detailed overvier over its elements
+
+```{r collapse = TRUE}
+str(lst)
+```
+
+List elements are accessed through three different indexing operations. 
+
+1. `[ ]`
+2. `[[ ]]`
+3. `$`
+
+```{r collapse=TRUE, error=TRUE}
+lst[1]
+
+lst[[1]]
+
+lst$Logical_Vector
+```
+
+The first one returns subsets a list, the other two options extract list components. The difference is subtle. A subset of a list is always a list itself, possibly of length 1. 
+
+```{r collapse = TRUE }
+class(lst[1])
+
+class(lst[[1]])
+
+class(lst$Logical_Vector)
+
+```
+
+Just like vectors, lists can be concatenated using the `c()` function. 
+
+Lists have the same attributes as atomical vectors: length, names, ty
+
+
+## Factors
+
+Factors are used to describe items that can have a finite number of values (gender, social class,
+etc.). Factors are currently implemented using an integer array to specify the actual *levels* and
+a second array of names (*labels*) that are mapped to the integers. Factors have a class attribute which has the value *factor* which makes it behave differently compared to standard integer vector.
+
+A factor is usually created with the function factor.
+
+```{r collapse = TRUE, error = TRUE}
+fac <- factor(c("green", "green", "blue", "green", "blue"))
+```
+
+A factor has its own attributes
+
+```{r collapse = TRUE, error = TRUE}
+class(fac)
+levels(fac)
+labels(fac)
+```
+
+Factors are indexed in the same manner atomic vectors are indexed. However, factor vectors cannot be concatenated or assigned values like atomic vectors. 
+
+```{r collapse=TRUE}
+# assignment idiosyncracies
+fac[2] <- "green"
+fac[2] <- "red"
+
+# concatenation idiosyncracies
+fac_1 <- factor(c("green", "green", "blue"))
+fac_2 <- factor(c("green", "blue", "blue"))
+
+c(fac_1, fac_2)
+factor(c(fac_1, fac_2), labels = c("green", "blue"))
+```
+
+
+
+
+## Data Frames
+
+Data frames are the most widely used structures in statistics. A data frame is a list of vectors, factors, and/or matrices all having the same length (number of rows in the case of matrices). It is, thus, a "two-dimensional" and shares some characteristics of matrices. Hence it shares properties of both vectors and matrices.
+
+A *data frame* is initialized by means of the function `data.frame()`. 
+
+```{r collapse = TRUE}
+df <- data.frame(V1 = 1:5, V2 = c("a", "a", "b", "a", "d"))
+str(df)
+```
+
+Since data frames are a mixture between lists and matrices, they have the attributes of both. For example the function `length()` returns the number of list components, which is the number of columns and hence the same as `ncol()`. While `nrow()` returns the the number of rows. Following the same reasoning, `names()` gives the names of the vectors which is the same as colnames. `rownames()` in turn gives the rownames.
+
+```{r collapse = TRUE}
+length(df)
+dim(df)
+
+names(df)
+colnames(df)
+rownames(df)
+```
+
+Lists, vectors and matrices can be coerced to data frames if it is
+appropriate. For lists this means if not all objects have the same
+“length”.
+
+```{r collapse = TRUE}
+vec_1 <- 1:5
+lst_1 <- list(vec_1 = vec_1, vec_2 = letters[c(1,2,3,2,1)])
+lst_2 <- list(vec_1 = vec_1, vec_2 = letters[c(1,2,3,2,1,3)])
+str(as.data.frame(vec_1))
+
+str(as.data.frame(mat))
+
+str(as.data.frame(lst_1))
+```
+
+The basic functions to combine two data frames (works similar with matrices) are cbind and rbind. When combining column-wise, then the numbers of rows must match and row names are ignored (hence observations need to be in the same order). When combining row-wise. The number of columns and their names must match. For more advanced combining see the function merge.
+
+
+## NULL
+
+There is a special object called NULL. It is used whenever there is a need to indicate or specify
+that an object is absent. It should not be confused with a vector or list of zero length.
+The NULL object has no type and no modifiable properties. There is only one NULL object
+in R, to which all instances refer. To test for NULL use is.null. You cannot set attributes on
+NULL.
+
+```{r chunk02, echo = TRUE, eval = FALSE}
+
+a <- NULL
+typeof(a)
+mode(a)
+storage.mode(a)
+
+```
