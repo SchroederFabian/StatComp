@@ -1,0 +1,196 @@
+---
+title: "107.106 AKSTA Statistical Computing"
+subtitle: "Control Structures"
+author: "Fabian Schroeder"
+date: "SS 2018"
+output: html_document
+---
+
+***
+
+### The Fibonacci Series
+
+In mathematics, the Fibonacci numbers are the numbers in an integer sequence characterized by the fact that every number after the first two is the sum of the preceding ones.
+
+1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+
+![The Fibonacci Sequence illustrated](/home/Fabian/Desktop/StatComp/fibo.png)
+
+The calculation of the Fibonacci series will provide an interesting example for excercising the different control structures.
+
+## Control Structures
+
+### `if/else`
+
+The if/else statement conditionally evaluates two statements. There is a condition which is
+evaluated and if the value is TRUE then the first statement is evaluated; otherwise the second
+statement will be evaluated. The if/else statement returns, as its value, the value of the
+statement that was selected. The formal syntax is
+
+```{r echo = TRUE, eval = FALSE}
+if ( condition )
+  expression 1
+else
+  expression 2
+
+```
+
+First, statement1 is evaluated to yield value1. If value1 is a logical vector with first element TRUE then statement2 is evaluated. If the first element of value1 is FALSE then statement3 is evaluated. If value1 is a numeric vector then statement3 is evaluated when the first element of value1 is zero and otherwise statement2 is evaluated. Only the first element of value1 is used. All other elements are ignored. If value1 has any type other than a logical or a numeric vector an error is signalled. 
+
+```{r echo = TRUE, eval = FALSE}
+n <- 12
+if (n < 0) {
+  print("n is negative!")
+}
+
+```
+
+The else clause is optional. The statement if(any(x <= 0)) x <- x[x <= 0] is valid. When the if statement is not in a block the else, if present, must appear on the same line as the end of statement2. Otherwise the new line at the end of statement2 completes the if and yields a syntactically complete statement that is evaluated. A simple solution is to use a compound statement wrapped in braces, putting the else on the same line as the closing brace that marks the end of the statement. The if/else statements can be nested.
+
+```{r echo = TRUE, eval = FALSE}
+if ( condition 1 ) {
+  expression 1
+} else if ( condition 2 ) {
+  expression 2
+} else if ( condition 3 ) {
+  expression 3
+} else
+  expression 4
+
+```
+
+There also exists an `ifelse()` function. The basic syntax is
+```
+ifelse(expression, TRUE, FALSE)
+```
+This function is usually used when `EXPR` is a vector. The result is then a vector of same length as `EXPR` and has as corresponding entry the value of `yes` if `EXPR` is `TRUE`, of `no` if `EXPR` is `FALSE` and missing values in `EXPR` stay missing values.
+
+Note that `ifelse` will try to coerce `EXPR` to logical if it is not. Also the attributes from `EXPR` will be kept and only the entries replaced.
+
+```{r collapse = TRUE}
+n <- 12
+ifelse(n < 0, "negative", "positive")
+
+```
+
+
+### Looping
+
+R has three statements that provide explicit looping. They are `for`, `while` and `repeat`. The
+two built-in constructs, `next` and `break`, provide additional control over the evaluation. 
+
+R provides other functions for implicit looping such as tapply, apply, and lapply. In addition
+many operations, especially arithmetic ones, are vectorized so you may not need to use a loop.
+There are two statements that can be used to explicitly control looping. They are break
+and next. The break statement causes an exit from the innermost loop that is currently being
+executed. The next statement immediately causes control to return to the start of the loop.
+The next iteration of the loop (if there is one) is then executed. No statement below next in
+the current loop is evaluated.
+The value returned by a loop statement is always NULL and is returned invisibly.
+
+
+### `for`
+
+The syntax of the for loop is
+
+``` {r eval = FALSE}
+for ( variable in sequence )
+ {
+  expressions
+ }
+```
+
+where vector can be either a vector or a list. For each element in vector the variable name is
+set to the value of that element and statement1 is evaluated. A side effect is that the variable
+name still exists after the loop has concluded and it has the value of the last element of vector
+that the loop was evaluated for.
+
+```{r collapse = TRUE}
+for (i in seq(1:10)) {
+  print(i)
+  if (i %% 9 ==0 ) break
+}
+  
+```
+
+> EX.1 : Calculate the n-th element of the Fibonacci series using the for() loop
+
+
+### `while`
+
+The while statement is very similar to the repeat statement. The syntax of the while loop is
+```{r eval = FALSE} 
+while ( condition ) expression
+```
+
+where statement1 is evaluated and if its value is TRUE then statement2 is evaluated. This process
+continues until statement1 evaluates to FALSE.
+
+```{r collapse = TRUE}
+i <- 1
+
+while(i < 6) {
+  print(i)
+  i <- i + 1
+}
+
+```
+
+> EX.2 : Calculate the n-th element of the Fibonacci series using the while() loop
+
+
+### `repeat`
+
+The repeat statement causes repeated evaluation of the body until a break is specifically re-
+quested. This means that you need to be careful when using repeat because of the danger of
+an infinite loop. The syntax of the repeat loop is
+
+```{r eval = FALSE} 
+repeat statement
+```
+
+When using repeat, statement must be a block statement. You need to both perform some
+computation and test whether or not to break from the loop and usually this requires two
+statements.
+
+```{r collapse = TRUE}
+i <- 1
+repeat {
+  print(i)
+  i <- i + 1
+  if (i == 6) break
+}
+
+```
+
+> EX.3 : Calculate the n-th element of the Fibonacci series using the repeat() loop
+
+### `switch`
+
+Technically speaking, switch is just another function, but its semantics are close to those of
+control structures of other programming languages. The syntax is
+```{r eval = FALSE}
+switch (expression, list)
+```
+where the elements of list may be named. First, statement is evaluated and the result, value,
+obtained. 
+
+
+```{r collapse = TRUE}
+
+centre <- function(x, type) {
+  switch(type,
+         mean = mean(x),
+         median = median(x),
+         trimmed = mean(x, trim = .1))
+}
+
+```
+
+> EX.4 : Write three different functions fibo_for(n), fibo_while(n), and fibo_repeat(n) which implement the calulation of the Fibonacci Series in three different ways. Then write a further function, called fibo_switch(n, type) which handles which approach is used by the argument type.
+
+
+
+
+
+
