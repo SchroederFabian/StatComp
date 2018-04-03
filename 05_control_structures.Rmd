@@ -1,6 +1,6 @@
 ---
 title: "107.106 AKSTA Statistical Computing"
-subtitle: "Control Structures"
+subtitle: "Control Statements"
 author: "Fabian Schroeder"
 date: "SS 2018"
 output: html_document
@@ -8,24 +8,15 @@ output: html_document
 
 ***
 
-### The Fibonacci Series
+## Control Statements
 
-In mathematics, the Fibonacci numbers are the numbers in an integer sequence characterized by the fact that every number after the first two is the sum of the preceding ones.
+R code is usually executed in a sequential way - one line after another. However, there are methods to control the flow of commands. These are called control statements and can be categorized into conditional control used for branching statements (`if/else`, and `switch`) and repetitive control used for looping statements (`for`, `while`, `repeat`).
 
-1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
-
-![The Fibonacci Sequence illustrated](/home/Fabian/Desktop/StatComp/fibo.png)
-
-The calculation of the Fibonacci series will provide an interesting example for excercising the different control structures.
-
-## Control Structures
+The `function` construct, itself, constitutes a different way to affect flow of commands and will be discussed in a later chapter. 
 
 ### `if/else`
 
-The if/else statement conditionally evaluates two statements. There is a condition which is
-evaluated and if the value is TRUE then the first statement is evaluated; otherwise the second
-statement will be evaluated. The if/else statement returns, as its value, the value of the
-statement that was selected. The formal syntax is
+The `if/else` statement conditionally evaluates two statements. The formal syntax is
 
 ```{r echo = TRUE, eval = FALSE}
 if ( condition )
@@ -35,17 +26,11 @@ else
 
 ```
 
-First, statement1 is evaluated to yield value1. If value1 is a logical vector with first element TRUE then statement2 is evaluated. If the first element of value1 is FALSE then statement3 is evaluated. If value1 is a numeric vector then statement3 is evaluated when the first element of value1 is zero and otherwise statement2 is evaluated. Only the first element of value1 is used. All other elements are ignored. If value1 has any type other than a logical or a numeric vector an error is signalled. 
+The condition is an expression which evaluates to a single logical value. 
+If the condition is TRUE then the first expression is evaluated; otherwise the second expression is evaluated. The `if/else` statement returns,
+as its value, the value of the expression that was selected. The `else` statement is optional. 
 
-```{r echo = TRUE, eval = FALSE}
-n <- 12
-if (n < 0) {
-  print("n is negative!")
-}
-
-```
-
-The else clause is optional. The statement if(any(x <= 0)) x <- x[x <= 0] is valid. When the if statement is not in a block the else, if present, must appear on the same line as the end of statement2. Otherwise the new line at the end of statement2 completes the if and yields a syntactically complete statement that is evaluated. A simple solution is to use a compound statement wrapped in braces, putting the else on the same line as the closing brace that marks the end of the statement. The if/else statements can be nested.
+The `if/else` statements can be nested.
 
 ```{r echo = TRUE, eval = FALSE}
 if ( condition 1 ) {
@@ -59,34 +44,86 @@ if ( condition 1 ) {
 
 ```
 
-There also exists an `ifelse()` function. The basic syntax is
-```
-ifelse(expression, TRUE, FALSE)
-```
-This function is usually used when `EXPR` is a vector. The result is then a vector of same length as `EXPR` and has as corresponding entry the value of `yes` if `EXPR` is `TRUE`, of `no` if `EXPR` is `FALSE` and missing values in `EXPR` stay missing values.
-
-Note that `ifelse` will try to coerce `EXPR` to logical if it is not. Also the attributes from `EXPR` will be kept and only the entries replaced.
+Let us look at a first trivial example which prints to the console depending on the sign of a number.
 
 ```{r collapse = TRUE}
 n <- 12
-ifelse(n < 0, "negative", "positive")
+
+if (n < 0) {
+  print("n is negative!")
+} else if (n == 0) {
+  print("n is 0!") 
+} else {
+  print("n is positive!")
+}
+
+```
+
+There also exists an `ifelse()` function. The basic syntax is
+```{r echo = TRUE, eval = FALSE}
+ifelse(condition, 'yes' , 'no')
+```
+This function is used when expression is a vector. The result is then a vector of same length as expression and has as corresponding entry the value of `yes` if expression is `TRUE`, of `no` if expression is `FALSE` and missing values in expression stay missing values. Note that `ifelse` will try to coerce the expression to logical if it is not. Also the attributes from expression will be kept and only the entries replaced.
+
+```{r collapse = TRUE}
+ifelse(c(1, 4, 2, -1, -2) < 0, "negative", "positive")
+
+```
+
+
+### `switch`
+
+A `switch` statement allows a variable to be tested for equality against a list of values. 
+The syntax is
+```{r eval = FALSE}
+switch (expression, case1, case2, case3, ...)
+```
+First, the condition is evaluated and matched to the cases. The condition must evaluate to a number or a character string. In case it evaluates to a character string the cases must be named. 
+
+The `switch` statement  
+
+```{r collapse = TRUE}
+centre <- function(x, type) {
+  switch(type,
+         mean = mean(x),
+         median = median(x),
+         trimmed = mean(x, trim = .1))
+}
 
 ```
 
 
 ### Looping
 
-R has three statements that provide explicit looping. They are `for`, `while` and `repeat`. The
-two built-in constructs, `next` and `break`, provide additional control over the evaluation. 
+R has three statements that provide explicit looping. They are `for`, `while` and `repeat`. `for` is used
+when the number of loops is known a priori whereas `while` and `repeate` can be used when the number of 
+loops is determined within the control statement and is, thus, not known a priori. The difference between `while`
+and `repeat` lies in the position of the condtion. In a `while` statement the condition is at the top of the statement
+whereas in a `repeat` statement the condition is usually at the end.
+
+The value returned by a loop statement is always `NULL` and is returned invisibly.
+
+There are two built-in constructs, `next` and `break`, which provide additional control over the evaluation. 
+The `break` statement causes an exit from the innermost loop that is currently being
+executed. This is the only way to terminate `repeat` loops. 
+
+The `next` statement immediately causes control to return to the start of the loop.
+The `next` iteration of the loop (if there is one) is then executed. No statement below `next` in
+the current loop is evaluated.
 
 R provides other functions for implicit looping such as tapply, apply, and lapply. In addition
 many operations, especially arithmetic ones, are vectorized so you may not need to use a loop.
-There are two statements that can be used to explicitly control looping. They are break
-and next. The break statement causes an exit from the innermost loop that is currently being
-executed. The next statement immediately causes control to return to the start of the loop.
-The next iteration of the loop (if there is one) is then executed. No statement below next in
-the current loop is evaluated.
-The value returned by a loop statement is always NULL and is returned invisibly.
+There are two statements that can be used to explicitly control looping. 
+
+#### Example: The Fibonacci Series
+
+In mathematics, the Fibonacci numbers are the numbers in an integer sequence characterized by the fact that every number after the first two is the sum of the two preceding ones.
+
+1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+
+The significance of this sequence lies in the fact that the ratio of the last two elements converges to the golden ratio, which is widely used in architecture and arts. The calculation of the Fibonacci series will provide an interesting example for excercising the following looping statements.
+
+<center> ![The Fibonacci Sequence illustrated](/home/Fabian/Desktop/StatComp/fibo.png){width=50%} </center>
 
 
 ### `for`
@@ -96,24 +133,34 @@ The syntax of the for loop is
 ``` {r eval = FALSE}
 for ( variable in sequence )
  {
-  expressions
+  expression
  }
 ```
 
-where vector can be either a vector or a list. For each element in vector the variable name is
-set to the value of that element and statement1 is evaluated. A side effect is that the variable
+where `sequence` can be either a vector or a list. For each element in `sequence` the variable name is
+set to the value of that element and the expressions are evaluated. A side effect is that the variable
 name still exists after the loop has concluded and it has the value of the last element of vector
 that the loop was evaluated for.
 
 ```{r collapse = TRUE}
 for (i in seq(1:10)) {
   print(i)
-  if (i %% 9 ==0 ) break
+  if (i %% 5 ==0 ) break
 }
   
 ```
 
-> EX.1 : Calculate the n-th element of the Fibonacci series using the for() loop
+> Excercise 1 : Calculate the n-th element of the Fibonacci series using the for() loop
+
+```{r collapse = TRUE}
+fibo <- vector(mode = "numeric", length = n)
+fibo[1] <- 1
+fibo[2] <- 1
+
+for (i in 3:n) {
+  fibo[i] <- fibo[i-1] + fibo[i-2]
+}
+```
 
 
 ### `while`
@@ -123,8 +170,11 @@ The while statement is very similar to the repeat statement. The syntax of the w
 while ( condition ) expression
 ```
 
-where statement1 is evaluated and if its value is TRUE then statement2 is evaluated. This process
-continues until statement1 evaluates to FALSE.
+where the `expression` is evaluated if the value of the condition is `TRUE`. This process
+continues until `condition` evaluates to `FALSE`. Thus, in order to avoid infinite looping the 
+condition must be modified during each run of the expressions.
+
+Let us look at a trivial example which prints all integers smaller than 6.
 
 ```{r collapse = TRUE}
 i <- 1
@@ -136,22 +186,36 @@ while(i < 6) {
 
 ```
 
-> EX.2 : Calculate the n-th element of the Fibonacci series using the while() loop
+> Excercise 2 : Calculate the largest Fibonacci number smaller than 1000 using the while() loop. Since 
+it is not a priori clear how many Fibonacci numbers under 1000 there are, this is a good example
+for the use of the `while` loop.
+
+```{r collapse = TRUE}
+
+fibo.new <- c(1,1)
+
+while (fibo.new[2] < 1000) {
+  fibo.old <- fibo.new
+  fibo.new[1] <- fibo.old[2]
+  fibo.new[2] <- fibo.old[1] + fibo.old[2]
+}
+
+fibo.new[1]
+
+```
 
 
 ### `repeat`
 
-The repeat statement causes repeated evaluation of the body until a break is specifically re-
-quested. This means that you need to be careful when using repeat because of the danger of
-an infinite loop. The syntax of the repeat loop is
+The `repeat` statement causes repeated evaluation of the body until a break is specifically requested.
+This means that you need to be careful when using repeat because of the danger of an infinite loop. The syntax of the repeat loop is
 
 ```{r eval = FALSE} 
-repeat statement
+repeat expression
 ```
 
-When using repeat, statement must be a block statement. You need to both perform some
-computation and test whether or not to break from the loop and usually this requires two
-statements.
+When using `repeat`, expression must be a grouped expression. You need to both perform some
+computation and test whether or not to break from the loop. This usually requires at least two expressions.
 
 ```{r collapse = TRUE}
 i <- 1
@@ -163,31 +227,21 @@ repeat {
 
 ```
 
-> EX.3 : Calculate the n-th element of the Fibonacci series using the repeat() loop
-
-### `switch`
-
-Technically speaking, switch is just another function, but its semantics are close to those of
-control structures of other programming languages. The syntax is
-```{r eval = FALSE}
-switch (expression, list)
-```
-where the elements of list may be named. First, statement is evaluated and the result, value,
-obtained. 
-
+> Excercise 3 : Calculate the largest Fibonacci number smaller than 1000 using the repeat() loop.
 
 ```{r collapse = TRUE}
+fibo.new <- c(1,1)
 
-centre <- function(x, type) {
-  switch(type,
-         mean = mean(x),
-         median = median(x),
-         trimmed = mean(x, trim = .1))
+repeat {
+  fibo.old <- fibo.new
+  fibo.new[1] <- fibo.old[2]
+  fibo.new[2] <- fibo.old[1] + fibo.old[2]
+  if (fibo.new[2] > 1000) break
 }
 
-```
+fibo.new[1]
 
-> EX.4 : Write three different functions fibo_for(n), fibo_while(n), and fibo_repeat(n) which implement the calulation of the Fibonacci Series in three different ways. Then write a further function, called fibo_switch(n, type) which handles which approach is used by the argument type.
+```
 
 
 
