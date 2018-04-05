@@ -1,0 +1,363 @@
+---
+title: "107.106 AKSTA Statistical Computing"
+subtitle: "Functions and Operators"
+author: "Fabian Schroeder"
+date: "SS 2018"
+output: html_document
+---
+ 
+***
+
+\Large
+
+> \ *Everything that exists is an object.*    
+> \ *Everything that happens is a function call.*  
+> \ *(John Chambers)*
+
+\normalsize  
+
+***  
+
+## Functions
+
+Functions are **fundamental building blocks** in R since they can be used to automate common tasks. As a rule of thumb, one should use a function whenever a block of code is evaluated more than twice. The use of function makes the code much more structered and readable and, thus, avoids mistakes. 
+
+The syntax for defining a function in R is 
+
+```{r}
+func_name <- function(arg1, arg2, ...) {
+  statements
+  return(object)
+}
+
+```
+
+All R functions have three parts:
+
+1.  `body`: the statements inside the function.
+2.  `formals`: the list of arguments which specify how to call the function.
+3.  `environment`: a guide to where variables of the function are located.When printing the function in the console it will display these parts. The environment is not shown if the function live in the global environment.
+
+The information about the body, the formals, and the environment of a function can be accessed by simply typing the name of the function into the console without the brackets.
+
+```{r collapse = TRUE, error = TRUE}
+sd
+```
+
+This also holds true for your own functions. We can use the functions `formals()`, `body()`, and   `environment()` to print this information to the console.
+
+```{r collapse = TRUE, error = TRUE}
+f <- function(x, y = 1) 2*(x+y)
+
+formals(f)
+
+body(f)
+
+environment(f)
+```
+
+There is one exception of a group of functions which have not the three parts just described - these are called **primitive functions**. All primitive functions are located in the **base** package and call directly **C code** and do not contain any R code. Thus, the 
+
+```{r collapse=TRUE}
+sum
+formals(sum)
+body(sum)
+environment(sum)
+```
+
+
+### Function arguments
+
+One has to distinguish between two types of arguments: 
+
+1. Formal arguments: these arguments are the "property" of the function.
+2. Actual arguments: these arguments can change with the function call.
+
+Hence, to use functions effectively, one needs to understand how the actual arguments are matched with the formal arguments. There are different ways to call functions:
+
+1. Named argument call: Arguments are matched by exact names.
+2. Partially named argument call: Arguments are matched using the shortest unique string.
+3. Positioning argument call: using the position of the arguments in the function definition.
+
+The three different ways can also be mixed in a function call. Then R uses first named matching, then partial named matching and finally position matching.
+
+```{r eval=FALSE, collapse=TRUE, error=TRUE}
+f <- function(Position1, Pos2, Pos3) 
+  {
+  list(pos1=Position1, pos2=Pos2, pos3=Pos3)
+  }
+
+# named argument call
+str(f(Position1 = 1, Pos2 = 2, Pos3 =3))
+
+# when using a named argument call, the order doesn't matter
+str(f(Pos2 = 2, Position1 = 1, Pos3 =3))
+
+# positioning argument call
+str(f(1, 2, 3))
+
+# mixing argument call styles
+str(f(2, 3, Position1 = 1))
+
+# partially named argument calls
+str(f(Posi = 1, 2, 3))
+```
+
+```{r collapse=TRUE, error=TRUE}
+str(f(1, Pos = 2, 3))
+```
+
+1. Positional matching should be only used for the very few first arguments. This is also why in 
+R functions the most important arguments to be specified by the user are always at the beginning.
+2. Partial matching should be avoided when possible when programming. For example packages submitted to CRAN cannot use partial matching.
+3. For formal arguments appearing after the special argument `...`, which will be discussed later, only (exact) named matching is possible. This is one reason why `...` is usually the last argument.  
+
+```{r collapse=TRUE, error=TRUE}
+# good calls
+mean(1:10)
+mean(1:10, trim=0.2)
+
+# confusing calls
+mean(1:10, n=T)
+mean(1:10, , FALSE)
+mean(1:10, 0.2)
+mean(, , TRUE, x=1:10)
+```
+
+
+In programming you will often have the case, that the arguments to call a function are specified in list.
+How to use that then for the actual function call? The solution is the function `do.call()`.
+
+```{r collapse=TRUE, error=TRUE}
+L1 <- list(1:10, na.rm=TRUE)
+do.call(mean, L1)
+```
+
+### Default Values Arguments
+
+Most functions in R give **default values** for most arguments. 
+
+```{r collapse=TRUE, error=TRUE}
+f1 <- function(a, b = 2*a) c(a,b)
+f1(3)
+f1(3,10)
+```
+
+
+### Missing arguments
+
+Sometimes reasonable default values might be complicated and lengthy expressions and difficult to add in the function definition. In those cases the **default** is computed within the function only if the argument was not user specified. To check if an argument is missing, the function `missing` is used. 
+
+```{r collapse=TRUE, error=TRUE}
+f1 <- function(a, b) 
+  {
+  if (missing(a)) a <- "default"
+  if (missing(b)) b <- "default"
+  list(a=a, b=b)
+  }
+
+str(f1())
+str(f1(1,2))
+```
+
+In R it is however more common to set in that case arguments to NULL as default and then check inside the function if the argument is NULL using `is.null`.
+
+```{r collapse=TRUE, error=TRUE}
+f2 <- function(a = NULL, b = NULL) 
+  {
+  if (is.null(a)) a <- "default"
+  if (is.null(b)) b <- "default"
+  list(a=a, b=b)
+  }
+
+str(f2())
+str(f2(1,2))
+```
+
+### The `...` argument
+
+There is a special argument called **`...`**. This argument **collects** all arguments not matched using the previous rules. These are then usually **passed on** to other functions. The `...` argument is especially used writing so called *wrapper* functions for existing ones where only a few arguments are assigned. E.g. in `plot()` most "tuning" parameters like colors, labels and axes parameters are specified via `...`.
+
+This flexibility comes at a cost:
+
+1. One needs to read the documentation to find out what `...` is passed on to and which arguments are meaningful.
+2. Misspelled arguments do not cause errors usually, as they are collected into the `...`.
+
+
+```{r collapse=TRUE, error=TRUE}
+MyLocation <- function(x, loc = "mean", ...) 
+  {
+  location <- match.arg(loc, c("median", "mean"))
+  LABEL <- location
+  location <- match.fun(location)
+  res <- location(x, ...)
+  attr(res, "location") <- LABEL
+  res
+  }
+
+set.seed(1)
+MyData <- rnorm(50)
+MyDataNA <- c(MyData, NA)
+
+MyLocation(MyData)
+
+MyLocation(MyData, "med")
+
+MyLocation(MyDataNA, na.rm=TRUE)
+
+MyLocation(MyDataNA, "med", na.rm=TRUE)
+
+MyLocation(MyData, trim=0.2)
+
+MyLocation(MyData, "med", trim=0.2)
+```
+
+
+A problem with `...` occurs when there are several functions to which you would like pass on arguments from `...` - because they must be valid arguments of all of them and get the same value in each function.
+
+It is then often easier to write a function which which as input takes lists with the possible inputs to passed on to the functions in question and use then `do.call`.
+
+
+### Function returns
+
+Functions in general can return only **one object** as a rule. Which is, however, not a real restriction as all the desired output can be collected into a list. If no return object was explicitely assigned, the last expression evaluated in a function is returned by default. Whenever the function `return(object)` is called within a function, the function is terminated and `object` is returned.
+
+
+```{r collapse=TRUE, error=TRUE}
+f1 <- function(x) 
+{
+if (x < 0) return("not positive")
+if (x < 5) {
+   "between 0 and 5"
+} else {
+ "larger than 5" 
+}
+  
+}
+f1(-1)
+f1(1)
+f1(10)
+```
+
+
+It is possible to return objects from a function call which are not printed by default using the `invisible()` function. Invisible output can be assigned to an object and/or forced to be printed by putting the function call between round parentheses.
+
+
+```{r collapse=TRUE, error=TRUE}
+f1 <- function() 1 
+f2 <- function() invisible(1)
+
+f1()
+f2()
+
+resf2 <- f2()
+resf2
+(f2())
+```
+
+
+> Excercise 1: Implement the Fibonacci series using a recursive function.
+
+```{r }
+
+fibo_rec <- function(n) {
+  
+  if (n <= 2) {
+    return(1)
+  } else {
+    return(fibo_rec(n-1) + fibo_rec(n-2))
+  }
+  
+}
+
+```
+
+
+## Operators
+
+R contains a number of operators, which can grosso modo be categorized into arithmetic operators and  logical operators. 
+
+### Assignment Operator
+
+One of the most fundamental operators is the assignment operator.
+
+```{r collapse = TRUE}
+a <- c(1,2,3)
+```
+
+### Arithmetic Operators
+
+The R console can be used as a scientific calculator.
+
+`+`, `-`, `*`, `/`, `^`, `%%`
+
+```{r collapse = TRUE}
+1.2 * 5^(-1.2*2)
+
+26 %% 5
+
+```
+
+
+### Logical Operators
+
+`!`, `&`, `&&`, `|`, `||`, `<`, `>`, `==`, `!=`, `<=`, `>=`
+
+
+```{r collapse = TRUE}
+
+x <- c(1:10)
+
+# which elements are greater than 8 or less than 5
+x[(x>8) | (x<5)]
+
+# every logical operator returns a vector with the same length as x with a TRUE/FALSE
+x > 8
+
+!(x > 8)
+
+x < 5
+
+x > 8 | x < 5
+
+x > 8 && x < 5
+
+
+```
+
+
+### Operators are Functions!
+
+Really, **every operation in R is a function call**. Even
+
+ `+`, `-`, `*`, `if`, `else`, `while`, `[`, `$`, `{`, ...
+ 
+are functions. In the following note that the backtick `'` lets you refer to functions or variables which have reserved or illegal names. Being allowed to use operators makes the code much more readible for human beings. To demonstrate this, check the following code:
+ 
+ 
+```{r collapse = TRUE}
+'+'(2,3)
+
+'for'(i, 1:2, print("'for' is a function"))
+
+'if'(i==1, print("'if' is a function too"), print("as well as 'else'"))
+
+'<-'(x, 1:5)
+'['(x,3)
+
+```
+
+Knowing that these operators are actually functions is especially useful when you want to use them in a looping structure. 
+
+```{r collapse=TRUE, error=TRUE, asis=TRUE}
+L1 <- list(a=1:3, b=70:77)
+L1
+
+sapply(L1, '[', 2)
+
+sapply(L1, '+', 10)
+
+```
+
+
+
