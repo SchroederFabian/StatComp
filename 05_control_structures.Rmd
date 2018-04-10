@@ -123,7 +123,7 @@ In mathematics, the Fibonacci numbers are the numbers in an integer sequence cha
 
 The significance of this sequence lies in the fact that the ratio of the last two elements converges to the golden ratio, which is widely used in architecture and arts. The calculation of the Fibonacci series will provide an interesting example for excercising the following looping statements.
 
-<center> ![The Fibonacci Sequence illustrated](/home/Fabian/Desktop/StatComp/fibo.png){width=50%} </center>
+<center> ![The Fibonacci Sequence illustrated](/home/Fabian/Desktop/StatComp/figures/fibo.png){width=50%} </center>
 
 
 ### `for`

@@ -1,0 +1,265 @@
+---
+title: "Data Import"
+author: "Fabian Schroeder"
+date: "April 9, 2018"
+output: html_document
+---
+
+
+## Data Import
+
+The first step in any data analysis is to load the data into your workspace. This seemingly easy task can be quite challenging since
+
+- data come in different formats 
+- data come in different sizes (and can exceed your memory)
+
+The format of the data does not only include the kind of file the data is saved in but also how the data is encoded, etc. Most data sets come in tabular or spreadsheet-like form, which means that each row stands for an observation and each coloumn for a variable. This kind of data is often referred to as flat data and can come in different file formats, eg. .csv, .txt, .xlsx. R can also import data from other statistical software platforms such as STATA, SPSS, SAS.
+Other forms include XML or HTML data, which is highly structured but not flat data.
+
+An important criteria for the choice of method is the size of the data. If the data set exceeds the size of you memory you cannot load the entire data set into your workspace and will have to work with databases. 
+
+This lesson is supposed to give a basic overview over the different kind of methods used to import data into the workspace. 
+
+
+### `read.table()` and derivatives
+
+The function `read.table`is the most convenient way to read in a rectangular grid of data. It belongs to the `utils`package and is loaded by default. Because of the many possibilities, there are several other function that call `read.table` but change a group of default arguments. These variants are `read.csv()`, `read.csv2()`, , `read.delim()`, `read.delim2()`. 
+
+The number of options can be seen from its help page
+
+```{r eval = FALSE} 
+read.table(file, header = FALSE, sep = "", quote = "\"'",
+           dec = ".", numerals = c("allow.loss", "warn.loss", "no.loss"),
+           row.names, col.names, as.is = !stringsAsFactors,
+           na.strings = "NA", colClasses = NA, nrows = -1,
+           skip = 0, check.names = TRUE, fill = !blank.lines.skip,
+           strip.white = FALSE, blank.lines.skip = TRUE,
+           comment.char = "#",
+           allowEscapes = FALSE, flush = FALSE,
+           stringsAsFactors = default.stringsAsFactors(),
+           fileEncoding = "", encoding = "unknown", text, skipNul = FALSE)
+
+read.csv(file, header = TRUE, sep = ",", quote = "\"",
+         dec = ".", fill = TRUE, comment.char = "", ...)
+
+read.csv2(file, header = TRUE, sep = ";", quote = "\"",
+          dec = ",", fill = TRUE, comment.char = "", ...)
+
+read.delim(file, header = TRUE, sep = "\t", quote = "\"",
+           dec = ".", fill = TRUE, comment.char = "", ...)
+
+read.delim2(file, header = TRUE, sep = "\t", quote = "\"",
+            dec = ",", fill = TRUE, comment.char = "", ...)
+
+```
+
+* `file`  The first argument is the name of the file which the data are to be read from. If it does not contain the absolute path, the file name is relative to the current working directory. Use `getwd()` to print it. `file` can also be a complete URL.
+
+* `header` a logical value indicating whether the file contains the names of the variables as its first line. If missing, the value is determined from the file format: header is set to TRUE if and only if the first row contains one fewer field than the number of columns.
+
+* `sep` the field separator character. Values on each line of the file are separated by this character. If sep = "" (the default for read.table) the separator is ‘white space’, that is one or more spaces, tabs, newlines or carriage returns.
+
+* `dec` the character used in the file for decimal points.
+
+* `na.strings`a character vector of strings which are to be interpreted as NA values. Blank fields are also considered to be missing values in logical, integer, numeric and complex fields.
+
+* `skip` integer: the number of lines of the data file to skip before beginning to read data.
+
+* `quote` the set of quoting characters. To disable quoting altogether, use quote = "". See scan for the behaviour on quotes embedded in quotes. Quoting is only considered for columns read as character, which is all of them unless colClasses is specified.
+
+```{r }
+library("datasets")
+write.csv(iris, "iris.csv")
+rm(list=ls())
+
+iris <- read.csv("iris.csv")
+str(iris)
+
+```
+
+
+### `readr` of the Tidyverse
+
+The Tidyverse contains its own implementation of these functions, which are bundled in the package `readr`.
+
+```{r eval = FALSE}
+library(readr)
+```
+
+The functionality of the function `read_csv` and `read_tsv` corresponds grosso mode to the functions `read.csv` and `read.delim` of the `utils` package, howecer, it is
+
+* faster
+* the argument `stringsAsFactors` is set to FALSE by default
+* output is a tibble, a special kind of data.frame
+
+``` {r eval = FALSE}
+read_delim(file, delim, quote = "\"", escape_backslash = FALSE,
+  escape_double = TRUE, col_names = TRUE, col_types = NULL,
+  locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+  comment = "", trim_ws = FALSE, skip = 0, n_max = Inf,
+  guess_max = min(1000, n_max), progress = show_progress())
+
+read_csv(file, col_names = TRUE, col_types = NULL,
+  locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+  quote = "\"", comment = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+  guess_max = min(1000, n_max), progress = show_progress())
+
+read_csv2(file, col_names = TRUE, col_types = NULL,
+  locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+  quote = "\"", comment = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+  guess_max = min(1000, n_max), progress = show_progress())
+
+read_tsv(file, col_names = TRUE, col_types = NULL,
+  locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+  quote = "\"", comment = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+  guess_max = min(1000, n_max), progress = show_progress())
+
+```
+
+```{r }
+library(readr)
+iris2 <- read_csv("iris.csv")
+str(iris)
+
+```
+
+The functions in `readr` print more output to the console which help the user verify that the data has been correctly imported. Notice, that the Species column was not saved as a factor but remained a character string. In this regards the default settings differ.
+
+### `data.table`
+
+The `data.table` package developed by Matt Dowle and Arun Srinivasan has one objective: to increase the speed of data importation. It is
+
+- super fast and
+- produces objects of class `data.table`, a special kind of data.frame.
+
+
+``` {r }
+library(data.table)
+
+iris3 <- fread("iris.csv")
+str(iris3)
+```
+
+The output of this function is of class `data.table` a child of `data.frame`. As in the `readr` package `fread()` does not save character strings as factors by default. 
+There is much more to the `data.table` package, which can be found in a separate data camp course. 
+
+
+### `read.xlsx`
+
+There are a few packages that import data from .xlsx files. My package of choice would be the `readxl` package by Hadley Wickham. `xlsx` and `XLConnect` also provide functions that can read from .xlsx files. However, they require `rJava` and are terribly slow.
+
+``` {r eval = FALSE}
+install.packages("readxl")
+library(readxl)
+```
+
+The first handy function lists all sheets in an excel speadsheet. 
+
+``` {r eval = FALSE}
+excel_sheets(path)
+```
+
+The actual reading of the file is implemented in `read_excel`
+
+```{r eval = FALSE}
+read_excel(path, sheet = NULL, range = NULL, col_names = TRUE,
+  col_types = NULL, na = "", trim_ws = TRUE, skip = 0, n_max = Inf,
+  guess_max = min(1000, n_max))
+```
+
+* `path` Path to the xls/xlsx file
+*  `sheet` Sheet to read. Either a string (the name of a sheet), or an integer (the position of the sheet). Ignored if the sheet is specified via range. If neither argument specifies the sheet, defaults to the first sheet.
+* `range` A cell range to read from, as described in cell-specification. Includes typical Excel ranges like "B3:D87", possibly including the sheet name like "Budget!B2:G14", and more. Interpreted strictly, even if the range forces the inclusion of leading or trailing empty rows or columns. Takes precedence over skip, n_max and sheet.
+* `col_names` TRUE to use the first row as column names, FALSE to get default names, or a character vector giving a name for each column. If user provides col_types as a vector, col_names can have one entry per column, i.e. have the same length as col_types, or one entry per unskipped column.
+* `col_types` Either NULL to guess all from the spreadsheet or a character vector containing one entry per column from these options: "skip", "guess", "logical", "numeric", "date", "text" or "list". If exactly one col_type is specified, it will be recycled. The content of a cell in a skipped column is never read and that column will not appear in the data frame output. A list cell loads a column as a list of length 1 vectors, which are typed using the type guessing logic from col_types = NULL, but on a cell-by-cell basis.
+
+* `na` Character vector of strings to use for missing values. By default, readxl treats blank cells as missing data.
+
+* `skip`	Minimum number of rows to skip before reading anything, be it column names or data. Leading empty rows are automatically skipped, so this is a lower bound. Ignored if range is given.
+* `n_max` Maximum number of data rows to read. Trailing empty rows are automatically skipped, so this is an upper bound on the number of rows in the returned tibble. Ignored if range is given.
+
+
+The easiest way to import all spreadsheets from an excel file and save them into a list is by
+
+```{r eval = FALSE}
+my_workbook <- lapply(excel_sheets("data.xlsx"), read_excel, path = "data.xlsx")
+
+```
+
+Currently there is not possibility to write .xlsx files from the R console with this package. Other packages, however, provide this function. 
+
+### Other formats
+
+The `haven` package of the Tidyverse provides all function to import and export data from/for SPSS, Stata, and SAS. 
+
+```{r eval = FALSE}
+install.packages("haven")
+library(haven)
+
+```
+The necessary functions are
+
+```{r eval = FALSE}
+read_sav(file, user_na = FALSE)
+
+read_por(file, user_na = FALSE)
+
+read_dta(file, encoding = NULL)
+
+read_sas(data_file, catalog_file = NULL, encoding = NULL,
+  catalog_encoding = encoding, cols_only = NULL)
+
+```
+
+
+### Import XML Data
+
+When reading data from text files, it is the responsibility of the user to know and to specify the conventions used to create that file, e.g. the comment character, whether a header line is present, the value separator, the representation for missing values (and so on) described in Export to text files. A markup language which can be used to describe not only content but also the structure of the content can make a file self-describing, so that one need not provide these details to the software reading the data.
+
+The eXtensible Markup Language – more commonly known simply as XML – can be used to provide such structure, not only for standard datasets but also more complex data structures. XML is becoming extremely popular and is emerging as a standard for general data markup and exchange. It is being used by different communities to describe geographical data such as maps, graphical displays, mathematics and so on. 
+The function necessary to parse an XML document, `xmlInternatTreeParse()` or `xmlTreeParse()`, are in the `XML` package and can be installed via
+
+``` {r eval = FALSE}
+install.packages("XML")
+library(XML)
+```
+
+
+### Importing from Databases
+
+Instead of loading all the data into RAM, as R does, databases query data from the hard-disk. This can allow a subset of a very large dataset to be defined and read into R quickly, without having to load it first. However, this depends of the kind of data base that we want to load from. There are many different kinds of databases. An excellent overview over the differenct packages and functions can be found under
+[https://db.rstudio.com/databases/](https://db.rstudio.com/databases/).
+
+As an example, let us have a look at the `RODBC` package. It is one the most mature packages of this kind and sets up links to external databases using the Open Database Connectivity (ODBC) API. `RODBC` connects to ‘traditional’ databases such as MySQL, PostgreSQL, Oracle and SQLite.
+
+The function used to set-up a connection to an external database with `RODBC` is `odbcConnect`, which takes Data Source Name (`dsn`), User ID (`uid`) and password (`pwd`) as required arguments. 
+
+```{r eval=FALSE}
+require(RODBC)
+
+#open the ODBC connection
+ch <- odbcConnect("ODBCDriverName")
+
+##### Alternative ODBC connection for Microsoft SQL Server
+ch <- odbcDriverConnect(
+                        "Driver=SQL Server; Server=servername\\instance; Database=databasename; UID=username; Pwd=password"
+                       )
+
+#run the query, store in a data frame
+sqlResult <- sqlQuery(ch, "SELECT ...
+                FROM ...
+                WHERE ...
+                ;")
+
+#close the ODBC connection
+odbcClose(ch)
+
+```
+
+
+A new development is the ability to interact with databases using exactly the same syntax used to interact with R objects stored in RAM. This innovation was made possible by dplyr, an R library for data processing that aims to provide a unified ‘front end’ to perform a wide range of analysis task on datasets using a variety of ‘back ends’ which do the number crunching. This is one of the main advantages of `dplyr`. It translates the data wrangling function from the `dplyr` package to `SQL` queries. Thus, your R code is translated into SQL and executed in the database, not in R. When working with databases, dplyr tries to be as lazy as possible:
+
+* It never pulls data into R unless you explicitly ask for it.
+* It delays doing any work until the last possible moment: it collects together everything you want to do and then sends it to the database in one step.
+
+

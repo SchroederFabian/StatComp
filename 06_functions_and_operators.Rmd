@@ -20,7 +20,7 @@ output: html_document
 
 ## Functions
 
-Functions are **fundamental building blocks** in R since they can be used to automate common tasks. As a rule of thumb, one should use a function whenever a block of code is evaluated more than twice. The use of function makes the code much more structered and readable and, thus, avoids mistakes. 
+Functions are **fundamental building blocks** in R since they can be used to automate common tasks. As a rule of thumb, one should use a function whenever a block of code is evaluated more than twice with different parameters. The use of function makes the code much more structered and readable and, thus, avoids mistakes. 
 
 The syntax for defining a function in R is 
 
@@ -32,11 +32,30 @@ func_name <- function(arg1, arg2, ...) {
 
 ```
 
-All R functions have three parts:
+
+> Excercise 1: Implement the Fibonacci series using a recursive function.
+
+```{r }
+
+fibo_rec <- function(n) {
+  
+  if (n <= 2) {
+    return(1)
+  } else {
+    return(fibo_rec(n-1) + fibo_rec(n-2))
+  }
+  
+}
+
+```
+
+### Structure of Functions
+
+All R functions have three components:
 
 1.  `body`: the statements inside the function.
 2.  `formals`: the list of arguments which specify how to call the function.
-3.  `environment`: a guide to where variables of the function are located.When printing the function in the console it will display these parts. The environment is not shown if the function live in the global environment.
+3.  `environment`: a guide to where variables of the function are located. When printing the function in the console it will display these parts. The environment is not shown if the function live in the global environment.
 
 The information about the body, the formals, and the environment of a function can be accessed by simply typing the name of the function into the console without the brackets.
 
@@ -56,7 +75,7 @@ body(f)
 environment(f)
 ```
 
-There is one exception of a group of functions which have not the three parts just described - these are called **primitive functions**. All primitive functions are located in the **base** package and call directly **C code** and do not contain any R code. Thus, the 
+There is one exception of a group of functions which do not have the three parts just described - these are called **primitive functions**. All primitive functions are located in the **base** package and call directly **C code** and do not contain any R code. Thus, the `formals()`, the `body()`, and the `environment()` of primitive function are all `NULL`.
 
 ```{r collapse=TRUE}
 sum
@@ -133,8 +152,6 @@ L1 <- list(1:10, na.rm=TRUE)
 do.call(mean, L1)
 ```
 
-### Default Values Arguments
-
 Most functions in R give **default values** for most arguments. 
 
 ```{r collapse=TRUE, error=TRUE}
@@ -142,9 +159,6 @@ f1 <- function(a, b = 2*a) c(a,b)
 f1(3)
 f1(3,10)
 ```
-
-
-### Missing arguments
 
 Sometimes reasonable default values might be complicated and lengthy expressions and difficult to add in the function definition. In those cases the **default** is computed within the function only if the argument was not user specified. To check if an argument is missing, the function `missing` is used. 
 
@@ -256,21 +270,136 @@ resf2
 ```
 
 
-> Excercise 1: Implement the Fibonacci series using a recursive function.
+### Lexical Scoping
 
-```{r }
+This term describes a set of rules that tells R how to find values from names, aka lexical scoping. Lexical scoping looks up symbol values based on how functions were nested when they were created, not how they are nested when they are called. With lexical scoping, you don’t need to know how the function is called to figure out where the value of a variable will be looked up. You just need to look at the function’s definition.
 
-fibo_rec <- function(n) {
-  
-  if (n <= 2) {
-    return(1)
-  } else {
-    return(fibo_rec(n-1) + fibo_rec(n-2))
-  }
-  
+There are four basic principles behind R’s implementation of lexical scoping:
+
+* name masking
+* functions vs. variables
+* a fresh start
+* dynamic lookup
+
+#### Name masking
+
+This principle is best explained by means of examples
+
+```{r collapse = TRUE}
+f <- function() {
+  x <- 1
+  y <- 2
+  c(x, y)
 }
+f()
+rm(f)
+```
+
+If a name isn’t defined inside a function, R will look one level up.
+
+```{r collapse = TRUE}
+x <- 2
+g <- function() {
+  y <- 1
+  c(x, y)
+}
+g()
+rm(x, g)
+```
+
+The same rules apply if a function is defined inside another function: look inside the current function, then where that function was defined, and so on, all the way up to the global environment, and then on to other loaded packages. Run the following code in your head, then confirm the output by running the R code.
+
+```{r collapse = TRUE}
+x <- 1
+h <- function() {
+  y <- 2
+  i <- function() {
+    z <- 3
+    c(x, y, z)
+  }
+  i()
+}
+h()
+rm(x, h)
+```
+
+#### Function vs. variables
+
+The same principles apply regardless of the type of associated value — finding functions works exactly the same way as finding variables:
+
+```{r collapse = TRUE}
+l <- function(x) x + 1
+m <- function() {
+  l <- function(x) x * 2
+  l(10)
+}
+m()
+```
+
+For functions, there is one small tweak to the rule. If you are using a name in a context where it’s obvious that you want a function (e.g., f(3)), R will ignore objects that are not functions while it is searching. In the following example n takes on a different value depending on whether R is looking for a function or a variable.
+
+```{r collapse = TRUE}
+n <- function(x) x / 2
+o <- function() {
+  n <- 10
+  n(n)
+}
+o()
+```
+
+However, using the same name for functions and other objects will make for confusing code, and is generally best avoided.
+
+#### A fresh start
+
+What happens to the values in between invocations of a function? What will happen the first time you run this function? What will happen the second time? (If you haven’t seen `exists()` before: it returns `TRUE` if there’s a variable of that name, otherwise it returns `FALSE`.)
+
+```{r collapse = TRUE}
+j <- function() {
+  if (!exists("a")) {
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+j()
+j()
+a <- 2
+j()
+rm(j)
 
 ```
+
+
+You might be surprised that it returns the same value, 1, every time. This is because every time a function is called, a new environment is created to host execution. A function has no way to tell what happened the last time it was run; each invocation is completely independent.
+
+
+
+#### Dynamic lookup 
+
+Lexical scoping determines where to look for values, not when to look for them. R looks for values when the function is run, not when it’s created. This means that the output of a function can be different depending on objects outside its environment:
+
+```{r collapse = TRUE}
+f <- function() x
+x <- 15
+f()
+
+x <- 20
+f()
+
+```
+
+You generally want to avoid this behaviour because it means the function is no longer self-contained. This is a common error — if you make a spelling mistake in your code, you won’t get an error when you create the function, and you might not even get one when you run the function, depending on what variables are defined in the global environment.
+
+One way to detect this problem is the `findGlobals()` function from `codetools`. This function lists all the external dependencies of a function: 
+
+```{r collapse = TRUE}
+f <- function() x + 1
+codetools::findGlobals(f)
+```
+
+
+
 
 
 ## Operators
