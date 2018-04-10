@@ -85,6 +85,22 @@ environment(sum)
 ```
 
 
+> Excercise B: Make a list of all function of the base package
+
+```{r eval = FALSE}
+objs <- mget(ls("package:base"), inherits = TRUE)
+funs <- Filter(is.function, objs)
+names(funs)
+```
+
+> Excercise C: Select all primitive functions from the base package
+
+```{r eval = FALSE}
+prim.funs <- Filter(is.primitive, funs)
+names(prim.funs)
+```
+
+
 ### Function arguments
 
 One has to distinguish between two types of arguments: 
@@ -399,7 +415,28 @@ codetools::findGlobals(f)
 ```
 
 
+> Excercise D: What does the following code return? What do the different cs stand for?
 
+```{r eval = FALSE}
+c <- 10
+c(c = c)
+```
+
+> Excercise E: What does the following function return?
+
+```{r eval = FALSE}
+f <- function(x) {
+  f <- function(x) {
+    f <- function(x) {
+      x ^ 2
+    }
+    f(x) + 1
+  }
+  f(x) * 2
+}
+
+f(10)
+```
 
 
 ## Operators
