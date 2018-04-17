@@ -1,0 +1,96 @@
+---
+title: "107.106 AKSTA Statistical Computing"
+subtitle: "Graphics with R" 
+author: "Fabian Schroeder"
+date: "SS 2018"
+output: html_document
+---
+
+ 
+ 
+ 
+
+
+
+
+## Plotting example I
+The following plot should give an impression of the colours, symbols and point sizes in R.
+
+```{r}
+plot(1,1,xlim=c(1,10),ylim=c(0,5),type="n")
+points(1:9,rep(4.5,9),cex=1:9,col=1:9,pch=0:8)
+text(1:9,rep(3.5,9),labels=paste(0:9),cex=1:9,col=1:9)
+points(1:9,rep(2,9),pch=9:17)
+text((1:9)+0.25,rep(2,9),paste(9:17))
+points(1:8,rep(1,8),pch=18:25)
+text((1:8)+0.25,rep(1,8),paste(18:25))
+```
+ 
+## Plotting example II
+
+This plot is about putting two figures into one window.
+```{r}
+set.seed(1) # to make it reproducible
+x<-rnorm(80)
+breaks<-(-ceiling(max(abs(x))):ceiling(max(abs(x))))
+ylim=c(0,0.6)
+par(mfrow=c(1,2))
+hist(x,freq=F,breaks=breaks,add=F,ylim=ylim)
+curve(dnorm(x),add=TRUE)
+plot(density(x),type="l",main="Kernel Density of x"
+     ,ylim=ylim)
+hist(x,freq=FALSE,add=TRUE)
+par(mfrow=c(1,1))
+```
+ 
+
+## Plotting example III
+
+This example shows how to insert a legend interactively into a scatter plot which has regression lines added. And also how to deal with long titles.
+
+```{r, eval=FALSE}
+library(MASS)
+data(whiteside)
+attach(whiteside)
+After<-subset(whiteside,Insul=="After")
+Before<-subset(whiteside,Insul=="Before")
+lm.after<-lm(Gas~Temp,data=After)
+lm.before<-lm(Gas~Temp,data=Before)
+plot(Temp,Gas,pch=as.numeric(Insul),
+main="Gas comsumption of Derek Whiteside's\n house
+before and after insulation")
+abline(lm.before)
+abline(lm.after)
+legend(locator(1),legend=c("Before insulation",
+"After insulation"),pch=c(1,2))
+```
+
+
+## Plotting example IV
+
+This example show parallel boxplots which are made using a model formulae. The ticks on the right and left side of the plot indicate the observations.   
+
+The data used are the same as in the example before.
+
+```{r, eval=FALSE}
+boxplot(Gas~Insul,col=c("grey50","grey80"))
+rug(Gas[Insul=="Before"],side=2)
+rug(Gas[Insul=="After"],side=4)
+```
+ 
+
+## Plotting example IV - the plot
+
+```{r, echo=FALSE}
+library(MASS)
+data(whiteside)
+attach(whiteside)
+After<-subset(whiteside,Insul=="After")
+Before<-subset(whiteside,Insul=="Before")
+lm.after<-lm(Gas~Temp,data=After)
+lm.before<-lm(Gas~Temp,data=Before)
+boxplot(Gas~Insul,col=c("grey50","grey80"))
+rug(Gas[Insul=="Before"],side=2)
+rug(Gas[Insul=="After"],side=4)
+```
+ 

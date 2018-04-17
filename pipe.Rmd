@@ -9,9 +9,7 @@ output: html_document
 
 Pipes are a powerful tool for expressing a sequence of multiple operations in a way that is easily comprehensible by the human mind. Its introduction is one of the biggest changes to the R language in recent years. 
 
-The pipe, %>%, was introduced to the R language by the magrittr package by Stefan Milton Bache. It existed in other programming languages before and is, thus, not an R specific method. However, it is in particulary useful for data science.
-
-Packages in the tidyverse load %>% for you automatically, so you don’t usually load magrittr explicitly. 
+The pipe, %>%, was introduced to the R language by the magrittr package by Stefan Milton Bache. It existed in other programming languages before and is, thus, not an R specific method. However, it is in particulary useful for data science. Even though it was not originally developed for the `tidyverse` it is now an essential part of it and the `magrittr` package is automatically loaded by loading the `tidyverse`.
 
 ``` {r}
 library(magrittr)
@@ -21,7 +19,7 @@ Let us start with an introductory example by the author himself in the following
 
 [blog](https://www.r-statistics.com/2014/08/simpler-r-coding-with-pipes-the-present-and-future-of-the-magrittr-package/)
 
-```{r }
+```{r collpse = TRUE, fig.align="center"}
 library(babynames) # data package
 library(dplyr)     # provides data manipulating functions.
 library(magrittr)  # ceci n'est pas un pipe
@@ -64,7 +62,7 @@ We’ll work through each approach, showing you the code and talking about the a
 
 The simplest approach is to save each step as a new object:
 
-``` {r }
+``` {r eval = FALSE}
 data_1 <- func_1(data)
 data_2 <- func_2(data_1)
 data_3 <- func_3(data_2)
@@ -82,7 +80,7 @@ You may also worry that this form creates many copies of your data and takes up 
 
 Instead of creating intermediate objects at each step, we could overwrite the original object:
 
-``` {r }
+``` {r eval = FALSE}
 data <- func_1(data)
 data <- func_2(data)
 data <- func_3(data)
@@ -110,21 +108,30 @@ Here the disadvantage is that you have to read from inside-out, from right-to-le
 
 ### Use the pipe
 
+```{r eval=FALSE}
 data %>%
   func_1(arg_1) %>%
   func_2(arg_2) %>%
   func_3(arg_3)
+```
+
+### Review the example
+
+Let us have a closer look at the example
+
+```{r eval=FALSE}
+babynames %>%
+    filter(name %>% substr(1, 3) %>% equals("Ste")) %>%
+    group_by(year, sex) %>%
+    summarize(total = sum(n)) %>%
+    qplot(year, total, color = sex, data = ., geom = "line") %>%
+    add(ggtitle('Names starting with "Ste"')) %>%
+    print
+
+```
 
 
+The example illustrates a few feature of %>%. Firstly, the dplyr functions filter, group_by, and summarize all take as first argument a data object, and as default this is where %>% will place its left-hand side. The babynames data is thus inserted as first argument in the call to filter. When the filtering is done, the result is passed as the first argument to group_by, and similarly for summarize. However, one is not always so fortunate that a function is designed to accept the data (or whatever you might be piping along) as its first argument (the dplyr functions are designed with %>% operations in mind). This is the case with e.g. qplot, but note the data = . argument. This tells %>% to place the left-hand side there, and not as the first argument. This is a simple and natural way to accommodate the lack of consistency of function signatures, and allows the left-hand side to go anywhere in the call on the right-hand side. You may also have noted that print is used without parentheses; this is to make the code even cleaner when only one the left-hand side is needed as input. Finally, note that %>% can be used in a nested fashion (a separate chain is found within the filter call) and that magrittr has aliases for commonly used operators, such as add for `+` and equals for `==` used above. These make pipe chains more readable (not necessarily shorter).
+ 
 
-
-Reversing thought, deciphering nested function calls, and making excessive use of temporary variables
-
- 
- The example illustrates a few features of %>%. Firstly, the dplyr functions filter, group_by, and summarize all take as first argument a data object, and as default this is where %>% will place its left-hand side. The babynames data is thus inserted as first argument in the call to filter. When the filtering is done, the result is passed as the first argument to group_by, and similarly for summarize. However, one is not always so fortunate that a function is designed to accept the data (or whatever you might be piping along) as its first argument (the dplyr functions are designed with %>% operations in mind). This is the case with e.g. qplot, but note the data = . argument. This tells %>% to place the left-hand side there, and not as the first argument. This is a simple and natural way to accommodate the lack of consistency of function signatures, and allows the left-hand side to go anywhere in the call on the right-hand side. You may also have noted that print is used without parentheses; this is to make the code even cleaner when only one the left-hand side is needed as input. Finally, note that %>% can be used in a nested fashion (a separate chain is found within the filter call) and that magrittr has aliases for commonly used operators, such as add for + and equals for == used above. These make pipe chains more readable (not necessarily shorter).
- 
- 
- 
- 
- 
 
