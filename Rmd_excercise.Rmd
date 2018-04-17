@@ -1,0 +1,61 @@
+---
+title: "The Iris Data Set"
+author: "Fabian Schroeder"
+date: "September 13, 2017"
+output: pdf_document
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+library("xtable")
+library("stargazer")
+data("iris")
+```
+
+*** 
+
+## Description
+
+This famous dataset [@fisher, @anderson] gives the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species or iris. The species are *Iris setosa, versicolor*, and *virginica*.  
+
+![Illustration of the Variables of the iris data set.](iris.png)
+
+Iris is a data frame with 150 cases (rows) and 5 variables (columns) named Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, and Species.
+
+```{r summary1, echo = FALSE}
+#summary(iris)
+```
+
+```{r echo = FALSE, results = "asis"}
+options(xtable.comment = FALSE)
+xtable::xtable(summary(iris), type = "latex", comment = FALSE, caption = "Summary of the data set")
+
+```
+
+## Scatterplot Matrix
+
+```{r scatterplot, echo = FALSE}
+plot(iris)
+```
+
+## Logistic Regression Analysis
+
+```{r echo = FALSE, include = FALSE}
+iris[['Is.Versicolor']] <- as.numeric(iris[['Species']] == 'versicolor')
+iris[['Is.Virginica']] <- as.numeric(iris[['Species']] == 'virginica')
+fit.1 <- glm(Is.Versicolor ~ Petal.Length + Sepal.Length, data = iris)
+fit.2 <- glm(Is.Virginica ~ Petal.Length + Sepal.Length, data = iris)
+#summary(fit)
+output <- capture.output(stargazer(fit.1, fit.2, title = 'Regression Results', summary=FALSE, header=FALSE))
+
+```
+
+
+```{r echo = FALSE, results = 'asis'}
+cat(output)
+```
+
+## References
+
+
+
