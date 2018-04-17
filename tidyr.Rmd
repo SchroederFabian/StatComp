@@ -1,6 +1,6 @@
 ---
 title: "Data Wrangling"
-author: "Fabian Schroeder"
+author: "fabian Schroeder"
 date: "April 17, 2018"
 output: html_document
 ---
@@ -36,7 +36,7 @@ qualitative). Values are organized in two ways. Every value belongs to a *variab
 height, temperature, duration) across units. An observation contains all values measured on
 the same unit (like a person, or a day, or a race) across attributes.
 
-<center>![](/home/Fabian/Desktop/StatComp/figures/tidyr1.png){width=70%}</center>
+<center>![](/home/fabian/Desktop/StatComp/figures/tidyr1.png){width=70%}</center>
 
 Tidy data is a standard way of mapping the meaning of a dataset to its structure. A dataset is
 messy or tidy depending on how rows, columns and tables are matched up with observations,
@@ -46,7 +46,7 @@ variables and types. In tidy data:
 2. Each observation forms a row.
 3. Each type of observational unit forms a table.
 
-<center>![](/home/Fabian/Desktop/StatComp/figures/tidyr2.png){width=50%}</center>
+<center>![](/home/fabian/Desktop/StatComp/figures/tidyr2.png){width=50%}</center>
 
 This table is the tidy version of the first one. Each row represents an observation, the result of one
 treatment on one person, and each column is a variable.
@@ -204,7 +204,7 @@ table4a %>%
 #> 6       China  2000 213766
 ```
 
-<center>![](/home/Fabian/Desktop/StatComp/figures/tidyr3.png)</center>
+<center>![](/home/fabian/Desktop/StatComp/figures/tidyr3.png)</center>
 
 > Excercise
 
@@ -277,7 +277,7 @@ spread(table2, key = type, value = count)
 #> 6       China  2000 213766 1280428583
 ```
 
-<center>![](/home/Fabian/Desktop/StatComp/figures/tidyr4.png)</center>
+<center>![](/home/fabian/Desktop/StatComp/figures/tidyr4.png)</center>
 
 > Excercise
 
@@ -357,7 +357,7 @@ table3 %>%
 
 ```
 
-<center>![](/home/Fabian/Desktop/StatComp/figures/tidyr5.png)</center>
+<center>![](/home/fabian/Desktop/StatComp/figures/tidyr5.png)</center>
 
 
 ### `unite()`
@@ -412,7 +412,7 @@ table5 %>%
 #> 6       China 20_00 213766/1280428583
 ```
 
-<center>![](/home/Fabian/Desktop/StatComp/figures/tidyr6.png)</center>
+<center>![](/home/fabian/Desktop/StatComp/figures/tidyr6.png)</center>
 
 
 
