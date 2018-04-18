@@ -1,0 +1,40 @@
+---
+title: "library_vs_require"
+author: "Fabian Schroeder"
+date: "April 18, 2018"
+output: html_document
+---
+
+## Difference between `library()` and `require()`
+
+`library(package)` and `require(package)` both load the package with name package and put it on the search list. `require` is designed for use inside other functions; it returns `FALSE` and gives a warning (rather than an error as `library()` does by default) if the package does not exist. Both functions check and update the list of currently loaded packages and do not reload a package which is already loaded. (If you want to reload such a package, call detach(unload = TRUE) or unloadNamespace first.) If you want to load a package without putting it on the search list, use requireNamespace.
+
+
+```{r }
+test <- library("abc")
+test
+
+test <- require("abc")
+test
+```
+
+You can use it in:
+
+```{r }
+if(require("lme4")){
+    print("lme4 is loaded correctly")
+} else {
+    print("trying to install lme4")
+    install.packages("lme4")
+    if(require(lme4)){
+        print("lme4 installed and loaded")
+    } else {
+        stop("could not install lme4")
+    }
+}
+
+```
+
+
+
+
