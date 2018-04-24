@@ -867,17 +867,7 @@ select(flights, dep_time, dep_time)
 ```
 
 
-Exercise 3. What does the `one_of()` function do? Why might it be helpful in conjunction with this vector?
-```
-vars <- c("year", "month", "day", "dep_delay", "arr_delay")
-```
-```{r }
-vars <- c("year", "month", "day", "dep_delay", "arr_delay") 
-select(flights, one_of(vars))
-```
-
-
-Exercise 4. Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?
+Exercise 3. Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?
 
 ``` 
 select(flights, contains("TIME"))

@@ -508,33 +508,33 @@ Attaching package: 'dplyr'</code></pre>
 <p>In this example X, Y, and Z are not different variables but values of a variable called stock. How can use separate to tidy the data?</p>
 <pre class="r"><code>&gt; gather(stocks, stock, price, -time)</code></pre>
 <pre><code># A tibble: 30 x 3
-   time       stock   price
-   &lt;date&gt;     &lt;chr&gt;   &lt;dbl&gt;
- 1 2009-01-01 X      1.35  
- 2 2009-01-02 X     -1.92  
- 3 2009-01-03 X     -1.40  
- 4 2009-01-04 X      0.691 
- 5 2009-01-05 X      0.789 
- 6 2009-01-06 X     -0.0691
- 7 2009-01-07 X      1.20  
- 8 2009-01-08 X     -0.357 
- 9 2009-01-09 X      1.29  
-10 2009-01-10 X      1.98  
+   time       stock  price
+   &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;
+ 1 2009-01-01 X     -1.05 
+ 2 2009-01-02 X     -0.288
+ 3 2009-01-03 X     -0.794
+ 4 2009-01-04 X     -0.996
+ 5 2009-01-05 X     -1.25 
+ 6 2009-01-06 X     -0.613
+ 7 2009-01-07 X     -0.674
+ 8 2009-01-08 X      0.365
+ 9 2009-01-09 X      0.811
+10 2009-01-10 X     -0.362
 # ... with 20 more rows</code></pre>
 <pre class="r"><code>&gt; stocks %&gt;% gather(stock, price, -time) # the same command using the pipe operator</code></pre>
 <pre><code># A tibble: 30 x 3
-   time       stock   price
-   &lt;date&gt;     &lt;chr&gt;   &lt;dbl&gt;
- 1 2009-01-01 X      1.35  
- 2 2009-01-02 X     -1.92  
- 3 2009-01-03 X     -1.40  
- 4 2009-01-04 X      0.691 
- 5 2009-01-05 X      0.789 
- 6 2009-01-06 X     -0.0691
- 7 2009-01-07 X      1.20  
- 8 2009-01-08 X     -0.357 
- 9 2009-01-09 X      1.29  
-10 2009-01-10 X      1.98  
+   time       stock  price
+   &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;
+ 1 2009-01-01 X     -1.05 
+ 2 2009-01-02 X     -0.288
+ 3 2009-01-03 X     -0.794
+ 4 2009-01-04 X     -0.996
+ 5 2009-01-05 X     -1.25 
+ 6 2009-01-06 X     -0.613
+ 7 2009-01-07 X     -0.674
+ 8 2009-01-08 X      0.365
+ 9 2009-01-09 X      0.811
+10 2009-01-10 X     -0.362
 # ... with 20 more rows</code></pre>
 </div>
 </div>
@@ -584,26 +584,26 @@ Attaching package: 'dplyr'</code></pre>
 <pre><code># A tibble: 3 x 11
   stock `2009-01-01` `2009-01-02` `2009-01-03` `2009-01-04` `2009-01-05`
   &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
-1 X            1.35        -1.92         -1.40        0.691        0.789
-2 Y            5.56         0.754         2.62       -0.906        1.79 
-3 Z            0.208        2.21         -1.60        3.26         2.63 
+1 X            -1.05       -0.288       -0.794       -0.996        -1.25
+2 Y            -1.03       -2.11        -0.165        0.281        -2.69
+3 Z            -1.69        0.418        4.01        -4.45         -1.43
 # ... with 5 more variables: `2009-01-06` &lt;dbl&gt;, `2009-01-07` &lt;dbl&gt;,
 #   `2009-01-08` &lt;dbl&gt;, `2009-01-09` &lt;dbl&gt;, `2009-01-10` &lt;dbl&gt;</code></pre>
 <pre class="r"><code>&gt; # another possibility would be to spread with key = stock
 &gt; stocksm %&gt;% spread(stock, price)</code></pre>
 <pre><code># A tibble: 10 x 4
-   time             X      Y      Z
-   &lt;date&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
- 1 2009-01-01  1.35    5.56   0.208
- 2 2009-01-02 -1.92    0.754  2.21 
- 3 2009-01-03 -1.40    2.62  -1.60 
- 4 2009-01-04  0.691  -0.906  3.26 
- 5 2009-01-05  0.789   1.79   2.63 
- 6 2009-01-06 -0.0691 -1.61  -2.00 
- 7 2009-01-07  1.20    2.24   2.54 
- 8 2009-01-08 -0.357   0.262 -5.11 
- 9 2009-01-09  1.29   -1.24  -0.549
-10 2009-01-10  1.98    1.46  -1.50 </code></pre>
+   time            X      Y      Z
+   &lt;date&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 2009-01-01 -1.05  -1.03  -1.69 
+ 2 2009-01-02 -0.288 -2.11   0.418
+ 3 2009-01-03 -0.794 -0.165  4.01 
+ 4 2009-01-04 -0.996  0.281 -4.45 
+ 5 2009-01-05 -1.25  -2.69  -1.43 
+ 6 2009-01-06 -0.613  0.916 -4.90 
+ 7 2009-01-07 -0.674 -1.64   2.61 
+ 8 2009-01-08  0.365  0.504 -8.29 
+ 9 2009-01-09  0.811 -0.196 -0.400
+10 2009-01-10 -0.362  0.576 -0.292</code></pre>
 <blockquote>
 <p>Excercise C</p>
 </blockquote>
@@ -716,6 +716,17 @@ table3 %&gt;%
 <li>The result is a new data frame.</li>
 </ul>
 <p>Together these properties make it easy to chain together multiple simple steps to achieve a complex result.</p>
+<pre><code>── Attaching packages ───────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>✔ ggplot2 2.2.1     ✔ purrr   0.2.4
+✔ tibble  1.4.2     ✔ stringr 1.3.0
+✔ ggplot2 2.2.1     ✔ forcats 0.3.0</code></pre>
+<pre><code>── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::between()   masks data.table::between()
+✖ dplyr::filter()    masks stats::filter()
+✖ dplyr::first()     masks data.table::first()
+✖ dplyr::lag()       masks stats::lag()
+✖ dplyr::last()      masks data.table::last()
+✖ purrr::transpose() masks data.table::transpose()</code></pre>
 </div>
 <div id="data-nycflights13" class="section level3">
 <h3>Data: nycflights13</h3>
@@ -818,7 +829,7 @@ table3 %&gt;%
 #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
 #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
 #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
-<p>Use desc() to re-order by a column in descending order:</p>
+<p>Use <code>desc()</code> to re-order by a column in descending order:</p>
 <pre class="r"><code>&gt; arrange(flights, desc(arr_delay))</code></pre>
 <pre><code># A tibble: 336,776 x 19
     year month   day dep_time sched_dep_time dep_delay arr_time
@@ -963,25 +974,7 @@ table3 %&gt;%
  9      557
 10      558
 # ... with 336,766 more rows</code></pre>
-<p>Exercise 3. What does the <code>one_of()</code> function do? Why might it be helpful in conjunction with this vector?</p>
-<pre><code>vars &lt;- c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;dep_delay&quot;, &quot;arr_delay&quot;)</code></pre>
-<pre class="r"><code>&gt; vars &lt;- c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;dep_delay&quot;, &quot;arr_delay&quot;) 
-&gt; select(flights, one_of(vars))</code></pre>
-<pre><code># A tibble: 336,776 x 5
-    year month   day dep_delay arr_delay
-   &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;
- 1  2013     1     1        2.       11.
- 2  2013     1     1        4.       20.
- 3  2013     1     1        2.       33.
- 4  2013     1     1       -1.      -18.
- 5  2013     1     1       -6.      -25.
- 6  2013     1     1       -4.       12.
- 7  2013     1     1       -5.       19.
- 8  2013     1     1       -3.      -14.
- 9  2013     1     1       -3.       -8.
-10  2013     1     1       -2.        8.
-# ... with 336,766 more rows</code></pre>
-<p>Exercise 4. Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?</p>
+<p>Exercise 3. Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?</p>
 <pre><code>select(flights, contains(&quot;TIME&quot;))</code></pre>
 <pre class="r"><code>&gt; select(flights, contains(&quot;TIME&quot;))
 &gt; select(flights, contains(&quot;TIME&quot;, ignore.case=FALSE))</code></pre>
