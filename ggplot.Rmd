@@ -1,0 +1,214 @@
+---
+title: "ggplot"
+output: html_document
+---
+
+## ggplot2 Graphics
+
+The package `ggplot2` by Hadley Wickham implements graphs based on the grammar of graphs ideas. The concept for this plotting framework was laid out by Leland Wilkinson in his 1999 book *Grammar of Graphics*.
+
+It has two main principles: 
+
+- Graphics consist of distinct layers of grammatical elements
+- Meaningful plots are built through aesthetic mappings
+
+There are seven grammatical elements in total, three are essential:
+
+- data, the dataset being plotted
+- aesthetics, the scales onto which we map our data
+- geometries, refers to the actual shape of the data in the plot
+
+The non-essential ones include:
+
+- facets, 
+- statistics
+- coordinates
+- themes
+
+<center>![](/home/Fabian2/Desktop/StatComp/figures/grammar.png)</center>
+
+A good reference for ggplot can be found at <http://ggplot2.tidyverse.org/reference/>.
+
+
+## Principles of ggplot
+
+All plots are generated with the same function: `ggplot()`. However, this function only initializes a ggplot object. It can be used to declare the input data frame for a graphic and to specify the set of plot aesthetics intended to be common throughout all subsequent layers unless specifically overridden.
+
+```
+ggplot(data = NULL, mapping = aes(), ..., environment = parent.frame())
+```
+
+It has two main arguments: 
+
+`data` Default dataset to use for plot. If not already a data.frame, will be converted to one by fortify. If not specified, must be suppled in each layer added to the plot.
+
+`mapping` Default list of aesthetic mappings to use for plot. If not specified, must be suppled in each layer added to the plot.
+
+```{r }
+library(ggplot2)
+p <- ggplot(data = mpg, mapping = aes(x = displ, y = hwy))
+
+```
+
+There are three common ways to invoke `ggplot()`:
+
+`ggplot(df, aes(x, y, <other aesthetics>))`
+
+`ggplot(df)`
+
+`ggplot()`
+
+The first method is recommended if all layers use the same data and the same set of aesthetics, although this method can also be used to add a layer using data from another data frame. See the first example below. The second method specifies the default data frame to use for the plot, but no aesthetics are defined up front. This is useful when one data frame is used predominantly as layers are added, but the aesthetics may vary from one layer to another. The third method initializes a skeleton ggplot object which is fleshed out as layers are added. This method is useful when multiple data frames are used to produce different layers, as is often the case in complex graphics.
+
+In order to see something, we have add "layers". These are added by using the `+` operator. Behind the scenes it calls the `layer()` function to create a new layer. You will never use the layer function, but it is good for your understanding of how ggplot2 works.
+
+```
+p + layer(
+  mapping = NULL, 
+  data = NULL,
+  geom = "point", geom_params = list(),
+  stat = "identity", stat_params = list(),
+  position = "identity"
+)
+```
+
+This call fully specifies the five components to the layer:
+
+- `mapping`: A set of aesthetic mappings, specified using the `aes()` function and combined with the plot defaults as described in aesthetic mappings. If `NULL`, uses the default mapping set in ggplot().
+
+- `data`: A dataset which overrides the default plot dataset. It is usually omitted (set to NULL), in which case the layer will use the default data specified in ggplot(). The requirements for data are explained in more detail in data.
+
+- `geom`: The name of the geometric object to use to draw each observation. Geoms are discussed in more detail in geom, and the toolbox explores their use in more depth. Geoms can have additional arguments. All geoms take aesthetics as parameters. If you supply an aesthetic (e.g. colour) as a parameter, it will not be scaled, allowing you to control the appearance of the plot, as described in setting vs. mapping. You can pass params in ... (in which case stat and geom parameters are automatically teased apart), or in a list passed to geom_params.
+
+- `stat`: The name of the statistical tranformation to use. A statistical transformation performs some useful statistical summary is key to histograms and smoothes. To keep the data as is, use the “identity” stat. Learn more in statistical transformations. You only need to set one of stat and geom: every geom has a default stat, and every stat a default geom. Most stats take additional parameters to specify the details of statistical transformation. You can supply params either in ... (in which case stat and geom parameters are automatically teased apart), or in a list called stat_params.
+
+- `position`: The method used to adjusting overlapping objects, like jittering, stacking or dodging. More details in position.
+
+It’s useful to understand the `layer()` function so you have a understanding of the layer object. But you’ll rarely use the full `layer()` call because it’s so verbose. Instead, you’ll use the shortcut geom_ functions: `geom_point(mapping, data, ...)` is exactly equivalent to `layer(mapping, data, geom = "point", ...)`.
+
+```{r}
+p + geom_point()
+```
+
+Five components of every layer
+
+### Data
+
+### Aesthetic mappings
+
+### Geoms
+
+### Stats
+
+### Position Adjustments
+
+
+### Statistics Layer
+
+There are two categories of functions: 
+  - those called from within a geom
+  - those called independently
+
+
+
+
+
+## Examples of ggplot2 plots
+
+
+# Univarite continuous variables
+
+```{r}
+vec <- data.frame("x"=rnorm(100))
+ggplot(vec, aes(x=x)) + 
+  geom_histogram(aes(y=..density..)) + 
+  geom_rug() +
+  stat_function(fun = dnorm, colour = "red",
+                are = list(mean = mean(vec$x), sd = sd(vec$x)))
+```
+
+
+
+```{r}
+vec <- data.frame("x"=rnorm(100))
+slope <- diff(quantile(vec$x, c(0.25, 0.75))) / diff(qnorm(c(0.25, 0.75)))
+int <- quantile(vec$x, 0.25) - slope * qnorm(0.25)
+ggplot(vec, aes(sample=x)) + 
+  stat_qq() + 
+  geom_abline(aes(slope = slope, intercept = int), col="red")
+  
+```
+
+
+
+Aus dem Dokument
+
+```{r}
+
+library(dplyr)
+
+class <- mpg %>%
+  group_by(class) %>%
+  summarise(n = n(), hwy = mean(hwy))
+
+class$n.spell <- paste0("n = ", class$n)
+
+ggplot(data = mpg, aes(y=hwy, x=class)) + 
+  geom_jitter() + 
+  geom_point(data = class, aes(x=class, y=hwy), col = "red", size = 4) + 
+  geom_text(data = class, aes(label = n.spell, y = 10 ))
+
+```
+
+
+
+Excercise 1
+
+```{r }
+
+ggplot(mpg) + 
+  geom_point(aes(displ, hwy))
+
+ggplot(data = mpg, mapping = aes(cty, hwy)) + 
+ geom_point() +
+ geom_smooth()
+
+ggplot(diamonds, aes(carat, price)) + 
+  geom_point(aes(log(brainwt), log(bodywt)), data = msleep)
+
+```
+
+Excercise 2
+
+```{r }
+
+ggplot(mpg) +
+  geom_point(aes(class, cty)) + 
+  geom_boxplot(aes(trans, hwy))
+
+```
+
+
+
+
+
+
+
+### Univariate categorical data
+
+``` {r fig.align="center", fig.width=5}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut))
+```
+
+
+### Univariate continuous data
+
+
+
+``` {r fig.align="center", fig.width=5}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
+```
+
+

@@ -83,35 +83,41 @@ select(flights, contains("TIME", ignore.case=FALSE))
 ## mutate()
 
 # EX 1
-flights_ext <- mutate(flights, dep_time_min = floor(dep_time / 100)*60 + dep_time %% 100)
+select(flights, dep_time, sched_dep_time)
+flights_ext <- mutate(flights, 
+                      dep_time_min = floor(dep_time / 100)*60 + dep_time %% 100,
+                      sched_dep_time_min = floor(sched_dep_time / 100)*60 + sched_dep_time %% 100)
+select(flights_ext, dep_time, sched_dep_time, dep_time_min, sched_dep_time_min)
 
 # EX 2
 select(flights, air_time, arr_time, dep_time)
-
-flights_ext <- mutate(flights, arr_time_min = floor(arr_time / 100)*60 + arr_time %% 100,
-                               dep_time_min = floor(dep_time / 100)*60 + dep_time %% 100,
+flights_ext <- mutate(flights_ext, arr_time_min = floor(arr_time / 100)*60 + arr_time %% 100,
                                air_time_min = arr_time_min - dep_time_min)
-
-select(flights_ext, air_time, arr_time_min, dep_time_min, air_time_min)
+select(flights_ext, arr_time_min, dep_time_min, air_time_min)
 
 # EX 3
 select(flights, dep_time, sched_dep_time, dep_delay)
-
-flights$sched_dep_time + flights$dep_delay == flights$dep_time
-
-flights_ext <- mutate(flights_ext, sched_dep_time_min = floor(sched_dep_time / 100)*60 + sched_dep_time)
-
-select(flights_ext, sched_dep_time_min, dep_delay, dep_time_min)
-
-flights_ext$sched_dep_time_min + flights_ext$dep_delay == flights_ext$dep_time_min
-
-
-mutate(flights_ext, dep_time_min)
+# flights$sched_dep_time + flights$dep_delay == flights$dep_time
+flights_ext$dep_time_min - flights_ext$sched_dep_time_min == flights_ext$dep_delay
+# does not fix delays over the time point 00:00
 
 
 # summarise()
 
 
+# EX 1
+
+sum.flights <- flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay)) %>%
+  group_by(flight) %>%
+  summarize(min_delay = min(arr_delay),
+            median_delay = median(arr_delay),
+            count = n())
+  
+  
+sum.flights %>%
+  filter(min_delay > 10, count > 5) %>%
+  arrange(desc(min_delay))
 
 # EX 2
 
@@ -164,4 +170,17 @@ flights %>%
   summarise(num_flght = n(), num_del = sum(is.na(arr_delay)), num_del / num_flght) %>%
   filter(num_flght < 1000) %>%
   ggplot(aes(x=num_flght, y=num_del)) + geom_point()
+
+
+
+
+
+flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay)) %>%
+  group_by(carrier) %>% 
+  summarise(count = n(), 
+            avg_delay = mean(arr_delay, rm.na=TRUE)) %>%
+  arrange(avg_delay, count) %>%
+  ggplot(aes(x=count, y=avg_delay)) +
+  geom_point()
 

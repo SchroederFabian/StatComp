@@ -1,0 +1,127 @@
+---
+title: "comparison"
+output: html_document
+---
+
+
+### Comparison between baseR and gglot2
+
+A good way to compare to the two philosophies is to create the same plots with both aproaches. Let us have a look at a few excellent examples taken from the blog "Tufte in R" by Lukasz Piwek to be found under ![](http://motioninsocial.com/tufte/#introduction).
+
+#### Minimal line plot in base graphics
+
+``` {r fig.align="center", fig.width=5}
+x <- 1967:1977
+y <- c(0.5,1.8,4.6,5.3,5.3,5.7,5.4,5,5.5,6,5)
+plot(y ~ x, axes=F, xlab="", ylab="", pch=16, type="b")
+axis(1, at=x, label=x, tick=F, family="serif")
+axis(2, at=seq(1,6,1), label=sprintf("$%s", seq(300,400,20)), tick=F, las=2, family="serif")
+abline(h=6,lty=2)
+abline(h=5,lty=2)
+text(max(x), min(y)*2.5,"Per capita\nbudget expanditures\nin constant dollars", adj=1, 
+     family="serif")
+text(max(x), max(y)/1.08, labels="5%", family="serif")
+```
+
+
+#### Minimal line plot in ggplot2
+
+``` {r fig.align="center", fig.width=5}
+library(ggplot2)
+library(ggthemes)
+x <- 1967:1977
+y <- c(0.5,1.8,4.6,5.3,5.3,5.7,5.4,5,5.5,6,5)
+d <- data.frame(x, y)
+ggplot(d, aes(x,y)) + geom_line() + geom_point(size=3) + theme_tufte(base_size = 15) +
+  theme(axis.title=element_blank()) + geom_hline(yintercept = c(5,6), lty=2) + 
+  scale_y_continuous(breaks=seq(1, 6, 1), label=sprintf("$%s",seq(300,400,20))) + 
+  scale_x_continuous(breaks=x,label=x) +
+  annotate("text", x = c(1977,1977.2), y = c(1.5,5.5), adj=1,  family="serif",
+           label = c("Per capita\nbudget expandures\nin constant dollars", "5%"))
+```
+
+#### Dot-dash plot in base graphics
+
+
+``` {r fig.align="center", fig.width=5}
+library(devtools)
+source_url("https://raw.githubusercontent.com/sjmurdoch/fancyaxis/master/fancyaxis.R")
+x <- faithful$waiting
+y <- faithful$eruptions
+plot(x, y, main="", axes=FALSE, pch=16, cex=0.8,
+     xlab="Time till next eruption (min)", ylab="Duration (sec)", 
+     xlim=c(min(x)/1.1, max(x)), ylim=c(min(y)/1.5, max(y)))
+axis(1, tick=F)
+axis(2, tick=F, las=2)
+axisstripchart(faithful$waiting, 1)
+axisstripchart(faithful$eruptions, 2)
+```
+
+
+#### Dot-dash plot in ggplot2
+
+
+``` {r fig.align="center", fig.width=5}
+library(ggplot2)
+library(ggExtra)
+library(ggthemes)
+p <- ggplot(faithful, aes(waiting, eruptions)) + geom_point() + theme_tufte(ticks=F)
+ggMarginal(p, type = "histogram", fill="transparent")
+```
+
+#### Marginal histogram scatterplot with base graphics
+
+``` {r fig.align="center", fig.width=5}
+library(devtools)
+source_url("https://raw.githubusercontent.com/sjmurdoch/fancyaxis/master/fancyaxis.R")
+x <- faithful$waiting
+y <- faithful$eruptions
+plot(x, y, main="", axes=FALSE, pch=16, cex=0.8,
+     xlab="Time till next eruption (min)", ylab="Duration (sec)", 
+     xlim=c(min(x)/1.1, max(x)), ylim=c(min(y)/1.5, max(y)))
+axis(1, tick=F)
+axis(2, tick=F, las=2)
+axisstripchart(faithful$waiting, 1)
+axisstripchart(faithful$eruptions, 2)
+```
+
+#### Marginal histogram scatterplot with ggplot2
+
+``` {r fig.align="center", fig.width=5}
+library(ggplot2)
+library(ggExtra)
+library(ggthemes)
+p <- ggplot(faithful, aes(waiting, eruptions)) + geom_point() + theme_tufte(ticks=F)
+ggMarginal(p, type = "histogram", fill="transparent")
+```
+
+
+#### Slopegraph in base graphics
+
+``` {r fig.align="center", fig.width=5, fig.height=12}
+library(devtools)
+install_github("leeper/slopegraph")#install Leeper's package from Github
+data(cancer)
+slopegraph(cancer, col.lines = 'gray', col.lab = 1, col.num = 1,
+           xlim = c(-.2,5),
+           main = "Estimate of % survival rates",
+           xlabels = c('5 Year','10 Year','15 Year','20 Year'))
+```
+
+#### Slopegraph in ggplot2
+
+``` {r fig.align="center", fig.width=5}
+library(ggplot2)
+library(ggthemes)
+library(devtools)
+library(RCurl)
+library(plyr)
+source_url("https://raw.githubusercontent.com/jkeirstead/r-slopegraph/master/slopegraph.r")
+d <- read.csv(text = getURL("https://raw.githubusercontent.com/jkeirstead/r-slopegraph/master/cancer_survival_rates.csv"))
+df <- build_slopegraph(d, x="year", y="value", group="group", method="tufte", min.space=0.04)
+df <- transform(df, x=factor(x, levels=c(5,10,15,20),
+                              labels=c("5 years","10 years","15 years","20 years")), y=round(y))
+ plot_slopegraph(df) + labs(title="Estimates of % survival rates") +
+   theme_tufte(base_size=16, ticks=F) + theme(axis.title=element_blank())
+```
+

@@ -119,7 +119,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">107.106 AKSTA Statistical Computing</h1>
-<h3 class="subtitle"><em>Data Objects</em></h3>
+<h3 class="subtitle"><em>Control Statements</em></h3>
 <h4 class="author"><em>Fabian Schroeder</em></h4>
 <h4 class="date"><em>SS 2018</em></h4>
 
@@ -127,386 +127,165 @@ $(document).ready(function () {
 
 
 <hr />
+<div id="control-statements" class="section level2">
+<h2>Control Statements</h2>
+<p>R code is usually executed in a sequential way - one line after another. However, there are methods to control the flow of commands. These are called control statements and can be categorized into conditional control used for branching statements (<code>if/else</code>, and <code>switch</code>) and repetitive control used for looping statements (<code>for</code>, <code>while</code>, <code>repeat</code>).</p>
+<p>The <code>function</code> construct, itself, constitutes a different way to affect flow of commands and will be discussed in a later chapter.</p>
+<div id="ifelse" class="section level3">
+<h3><code>if/else</code></h3>
+<p>The <code>if/else</code> statement conditionally evaluates two statements. The formal syntax is</p>
+<pre class="r"><code>if ( condition )
+  expression 1
+else
+  expression 2</code></pre>
+<p>The condition is an expression which evaluates to a single logical value. If the condition is TRUE then the first expression is evaluated; otherwise the second expression is evaluated. The <code>if/else</code> statement returns, as its value, the value of the expression that was selected. The <code>else</code> statement is optional.</p>
+<p>The <code>if/else</code> statements can be nested.</p>
+<pre class="r"><code>if ( condition 1 ) {
+  expression 1
+} else if ( condition 2 ) {
+  expression 2
+} else if ( condition 3 ) {
+  expression 3
+} else
+  expression 4</code></pre>
+<p>Let us look at a first trivial example which prints to the console depending on the sign of a number.</p>
+<pre class="r"><code>n &lt;- 12
 
-<blockquote>
-<p> <em>Everything that exists is an object.</em><br />
- <em>Everything that happens is a function call.</em><br />
- <em>(John Chambers)</em></p>
-</blockquote>
-
-<hr />
-<div id="data-objects" class="section level2">
-<h2>Data Objects</h2>
-<style>
-slides > slide { overflow: scroll; }
-
-</style>
-<p>In every computer language variables provide a means of accessing the data stored in memory. R does not provide direct access to the computer’s memory but rather provides a number of specialized data structures we will refer to as objects. These objects are referred to through symbols or variables.</p>
-<p>There are many different objects. In this lesson we will focus on those kinds that are ment to store data: <em>vectors</em>, <em>matrices</em>, <em>arrays</em>, <em>lists</em>, and <em>data frames</em>. These data objects differ with respect to their dimensionality and whether they are homogenous or heterogenous.</p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th>homogenous</th>
-<th>heterogenous</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1D</td>
-<td>vector</td>
-<td>list</td>
-</tr>
-<tr class="even">
-<td>2D</td>
-<td>matrix</td>
-<td>data frame</td>
-</tr>
-<tr class="odd">
-<td>nD</td>
-<td>array</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p>For every object we will learn how initialize it, fill it with data, index it, and learn about its <em>attributes</em>.</p>
+if (n &lt; 0) {
+  print(&quot;n is negative!&quot;)
+} else if (n == 0) {
+  print(&quot;n is 0!&quot;) 
+} else {
+  print(&quot;n is positive!&quot;)
+}
+## [1] &quot;n is positive!&quot;</code></pre>
+<p>There also exists an <code>ifelse()</code> function. The basic syntax is</p>
+<pre class="r"><code>ifelse(condition, 'yes' , 'no')</code></pre>
+<p>This function is used when expression is a vector. The result is then a vector of same length as expression and has as corresponding entry the value of <code>yes</code> if expression is <code>TRUE</code>, of <code>no</code> if expression is <code>FALSE</code> and missing values in expression stay missing values. Note that <code>ifelse</code> will try to coerce the expression to logical if it is not. Also the attributes from expression will be kept and only the entries replaced.</p>
+<pre class="r"><code>ifelse(c(1, 4, 2, -1, -2) &lt; 0, &quot;negative&quot;, &quot;positive&quot;)
+## [1] &quot;positive&quot; &quot;positive&quot; &quot;positive&quot; &quot;negative&quot; &quot;negative&quot;</code></pre>
 </div>
-<div id="vectors" class="section level2">
-<h2>Vectors</h2>
-<p>Vectors are one-dimensional data structures. In this section we will cover <em>atomic vectors</em>, where all elements must be of the same <em>type</em>.</p>
-<div id="initialize-and-create-vectors" class="section level3">
-<h3>Initialize and Create Vectors</h3>
-<pre class="r"><code># initialize a vector
-vec_num &lt;- vector(mode = &quot;numeric&quot;, length = 7)
-vec_log &lt;- vector(mode = &quot;logical&quot;, length = 7)
-vec_chr &lt;- vector(mode = &quot;character&quot;, length = 7)</code></pre>
-<p>In order to obtain the default values of the vector() function one can simply print them to the console</p>
-<pre class="r"><code>vec_num
-## [1] 0 0 0 0 0 0 0
-vec_log
-## [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-vec_chr
-## [1] &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot;</code></pre>
-<p>The following functions generate vectors and fill them according to some rule.</p>
-<pre class="r"><code># concatenate c()
-vec_chr &lt;- c(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;, &quot;Saturday&quot;, &quot;Sunday&quot;)
-vec_int &lt;- c(1L, 0L, 1L, 2L, 3L, 0L, 2L)
-vec_dou &lt;- c(1.0, 0, 1.0, 2.0, 3.0, 0, 2.0)
-is.vector(vec_int)
-## [1] TRUE
-
-# seqence seq()
-vec_num &lt;- seq(1,7)
-is.vector(vec_num)
-## [1] TRUE
-
-# repeat rep()
-vec_log &lt;- rep(TRUE, 7)
-is.vector(vec_log)
-## [1] TRUE</code></pre>
-<p>Vectors have three different properties: a <em>type</em> (<code>typeof()</code>), a length (<code>length()</code>), and its attributes including the names. R has six basic (‘atomic’) vector types: logical, integer, double, string (or character).</p>
-<pre class="r"><code>typeof(vec_log)
-## [1] &quot;logical&quot;
-typeof(vec_int)
-## [1] &quot;integer&quot;
-typeof(vec_dou)
-## [1] &quot;double&quot;
-
-length(vec_num)
-## [1] 7
-
-names(vec_num) &lt;- vec_chr
-attributes(vec_num)
-## $names
-## [1] &quot;Monday&quot;    &quot;Tuesday&quot;   &quot;Wednesday&quot; &quot;Thursday&quot;  &quot;Friday&quot;    &quot;Saturday&quot; 
-## [7] &quot;Sunday&quot;
-
-# use the structure function
-str(vec_num)
-##  Named int [1:7] 1 2 3 4 5 6 7
-##  - attr(*, &quot;names&quot;)= chr [1:7] &quot;Monday&quot; &quot;Tuesday&quot; &quot;Wednesday&quot; &quot;Thursday&quot; ...
-str(vec_int)
-##  int [1:7] 1 0 1 2 3 0 2</code></pre>
-<p>For programming also the following functions can be used to check the type of a vector: <code>is.logical()</code>, <code>is.character()</code>, <code>is.numeric()</code>, <code>is.double()</code>, <code>is.atomic()</code>, <code>is.numeric()</code> .</p>
+<div id="switch" class="section level3">
+<h3><code>switch</code></h3>
+<p>A <code>switch</code> statement allows a variable to be tested for equality against a list of values. The syntax is</p>
+<pre class="r"><code>switch (expression, case1, case2, case3, ...)</code></pre>
+<p>First, the condition is evaluated and matched to the cases. The condition must evaluate to a number or a character string. In case it evaluates to a character string the cases must be named.</p>
+<p>The <code>switch</code> statement</p>
+<pre class="r"><code>centre &lt;- function(x, type) {
+  switch(type,
+         mean = mean(x),
+         median = median(x),
+         trimmed = mean(x, trim = .1))
+}</code></pre>
 </div>
-<div id="indexing" class="section level3">
-<h3>Indexing</h3>
-<p>In R there is a wide range of indexing options. Even for atomic vectors there are <strong>six</strong> ways to subset:</p>
-<ol style="list-style-type: decimal">
-<li><strong>positive indexing</strong> using positive integers.</li>
-<li><strong>negative indexing</strong> using negative integers.</li>
-<li><strong>logical indexing</strong> using logical vectors.</li>
-<li><strong>named indexing</strong> using character vectors.</li>
-<li><strong>blank</strong> indexing.</li>
-<li><strong>zero</strong> indexing.</li>
-</ol>
-<pre class="r"><code># positive indexing
-vec_num[2]
-## Tuesday 
-##       2
-
-# positive indexing using a vector
-vec_num[c(1,3)]
-##    Monday Wednesday 
-##         1         3
-
-# negative indexing
-vec_num[-c(2,4)]
-##    Monday Wednesday    Friday  Saturday    Sunday 
-##         1         3         5         6         7
-
-# named indexing
-vec_num[&quot;Wednesday&quot;]
-## Wednesday 
-##         3
-
-# blank indexing
-vec_num[]
-##    Monday   Tuesday Wednesday  Thursday    Friday  Saturday    Sunday 
-##         1         2         3         4         5         6         7
-
-# zero indexing
-vec_num[0]
-## named integer(0)</code></pre>
-<p>Logical indexing is expecially useful because we can use logical operators to subset vectors.</p>
-<pre class="r"><code>vec_num[c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE)]
-## Saturday   Sunday 
-##        6        7
-
-vec_num[vec_num == 0]
-## named integer(0)
-
-vec_num[vec_num == 2]
-## Tuesday 
-##       2</code></pre>
+<div id="looping" class="section level3">
+<h3>Looping</h3>
+<p>R has three statements that provide explicit looping. They are <code>for</code>, <code>while</code> and <code>repeat</code>. <code>for</code> is used when the number of loops is known a priori whereas <code>while</code> and <code>repeate</code> can be used when the number of loops is determined within the control statement and is, thus, not known a priori. The difference between <code>while</code> and <code>repeat</code> lies in the position of the condtion. In a <code>while</code> statement the condition is at the top of the statement whereas in a <code>repeat</code> statement the condition is usually at the end.</p>
+<p>The value returned by a loop statement is always <code>NULL</code> and is returned invisibly.</p>
+<p>There are two built-in constructs, <code>next</code> and <code>break</code>, which provide additional control over the evaluation. The <code>break</code> statement causes an exit from the innermost loop that is currently being executed. This is the only way to terminate <code>repeat</code> loops.</p>
+<p>The <code>next</code> statement immediately causes control to return to the start of the loop. The <code>next</code> iteration of the loop (if there is one) is then executed. No statement below <code>next</code> in the current loop is evaluated.</p>
+<p>R provides other functions for implicit looping such as tapply, apply, and lapply. In addition many operations, especially arithmetic ones, are vectorized so you may not need to use a loop. There are two statements that can be used to explicitly control looping.</p>
+<div id="example-the-fibonacci-series" class="section level4">
+<h4>Example: The Fibonacci Series</h4>
+<p>In mathematics, the Fibonacci numbers are the numbers in an integer sequence characterized by the fact that every number after the first two is the sum of the two preceding ones.</p>
+<p>1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, …</p>
+<p>The significance of this sequence lies in the fact that the ratio of the last two elements converges to the golden ratio, which is widely used in architecture and arts. The calculation of the Fibonacci series will provide an interesting example for excercising the following looping statements.</p>
+<center>
+<img src="data:image/png;base64,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" alt="The Fibonacci Sequence illustrated" style="width:50.0%" />
+</center>
 </div>
 </div>
-<div id="matrices-and-arrays" class="section level2">
-<h2>Matrices and Arrays</h2>
-<p>Matrices and Data Frames are generalisation of vectors in the sense that they have two or more dimensions. They are initialized by means of the <code>matrix()</code> and the <code>array()</code> functions.</p>
-<pre class="r"><code>mat &lt;- matrix(1:6, ncol=3, nrow=2)
-mat
-##      [,1] [,2] [,3]
-## [1,]    1    3    5
-## [2,]    2    4    6
-
-arr &lt;- array(1:24, dim=c(3,4,2))
-arr
-## , , 1
-## 
-##      [,1] [,2] [,3] [,4]
-## [1,]    1    4    7   10
-## [2,]    2    5    8   11
-## [3,]    3    6    9   12
-## 
-## , , 2
-## 
-##      [,1] [,2] [,3] [,4]
-## [1,]   13   16   19   22
-## [2,]   14   17   20   23
-## [3,]   15   18   21   24</code></pre>
-<p>Matrices and Arrays have different attributes</p>
-<p>Subsetting of higher dimensional objects can be done in three ways:</p>
-<ol style="list-style-type: decimal">
-<li>using multiple vectors.</li>
-<li>using a single vector.</li>
-<li>using matrices</li>
-</ol>
-<p>Subsetting multi-dimensional structures generally follows the same rules as single-dimensional indexing for each index variable, with the relevant component of dimnames taking the place of names. A couple of special rules apply, though: Normally, a structure is accessed using the number of indices corresponding to its dimension. It is however also possible to use a single index in which case the dim and dimnames attributes are disregarded and the result is effectively that of c(m)[i]. Notice that m[1] is usually very different from m[1, ] or m[, 1]. It is possible to use a matrix of integers as an index. In this case, the number of columns of the matrix should match the number of dimensions of the structure, and the result will be a vector with length as the number of rows of the matrix. The following example shows how to extract the elements m[1, 1] and m[2, 2] in one operation.</p>
-<pre class="r"><code>mat[c(1,4,6)]
-## [1] 1 4 6
-
-mat[1,3]
-## [1] 5
-
-mat[1,]
-## [1] 1 3 5
-
-mat[,2]
-## [1] 3 4
-
-mat[matrix(rep(c(TRUE, FALSE), 3), nrow = 2)]
-## [1] 1 3 5
-
-arr[c(2,12,24)]
-## [1]  2 12 24
-
-arr[1,2,1]
-## [1] 4
-
-arr[1,,]
-##      [,1] [,2]
-## [1,]    1   13
-## [2,]    4   16
-## [3,]    7   19
-## [4,]   10   22
-
-arr[array(rep(c(TRUE, FALSE), 12), dim = c(3,4,2) )]
-##  [1]  1  3  5  7  9 11 13 15 17 19 21 23</code></pre>
-<p>Matrices have a few important attributes.</p>
-<pre class="r"><code>ncol(mat)
+<div id="for" class="section level3">
+<h3><code>for</code></h3>
+<p>The syntax of the for loop is</p>
+<pre class="r"><code>for ( variable in sequence )
+ {
+  expression
+ }</code></pre>
+<p>where <code>sequence</code> can be either a vector or a list. For each element in <code>sequence</code> the variable name is set to the value of that element and the expressions are evaluated. A side effect is that the variable name still exists after the loop has concluded and it has the value of the last element of vector that the loop was evaluated for.</p>
+<pre class="r"><code>for (i in seq(1:10)) {
+  print(i)
+  if (i %% 5 ==0 ) break
+}
+## [1] 1
+## [1] 2
 ## [1] 3
-nrow(mat)
+## [1] 4
+## [1] 5</code></pre>
+<blockquote>
+<p>Excercise 1 : Calculate the n-th element of the Fibonacci series using the for() loop</p>
+</blockquote>
+<pre class="r"><code>fibo &lt;- vector(mode = &quot;numeric&quot;, length = n)
+fibo[1] &lt;- 1
+fibo[2] &lt;- 1
+
+for (i in 3:n) {
+  fibo[i] &lt;- fibo[i-1] + fibo[i-2]
+}</code></pre>
+</div>
+<div id="while" class="section level3">
+<h3><code>while</code></h3>
+<p>The while statement is very similar to the repeat statement. The syntax of the while loop is</p>
+<pre class="r"><code>while ( condition ) expression</code></pre>
+<p>where the <code>expression</code> is evaluated if the value of the condition is <code>TRUE</code>. This process continues until <code>condition</code> evaluates to <code>FALSE</code>. Thus, in order to avoid infinite looping the condition must be modified during each run of the expressions.</p>
+<p>Let us look at a trivial example which prints all integers smaller than 6.</p>
+<pre class="r"><code>i &lt;- 1
+
+while(i &lt; 6) {
+  print(i)
+  i &lt;- i + 1
+}
+## [1] 1
 ## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5</code></pre>
+<blockquote>
+<p>Excercise 2 : Calculate the largest Fibonacci number smaller than 1000 using the while() loop. Since it is not a priori clear how many Fibonacci numbers under 1000 there are, this is a good example for the use of the <code>while</code> loop.</p>
+</blockquote>
+<pre class="r"><code>
+fibo.new &lt;- c(1,1)
 
-colnames(mat) &lt;- LETTERS[1:3]
-rownames(mat) &lt;- letters[1:2]
-mat
-##   A B C
-## a 1 3 5
-## b 2 4 6
+while (fibo.new[2] &lt; 1000) {
+  fibo.old &lt;- fibo.new
+  fibo.new[1] &lt;- fibo.old[2]
+  fibo.new[2] &lt;- fibo.old[1] + fibo.old[2]
+}
 
-# you can also use
-dimnames(mat)
-## [[1]]
-## [1] &quot;a&quot; &quot;b&quot;
-## 
-## [[2]]
-## [1] &quot;A&quot; &quot;B&quot; &quot;C&quot;</code></pre>
-<p>The counterpart of length for an array is dim and the counterpart of names is dimnames which is list of character vectors of appropriate length.</p>
-<pre class="r"><code>dim(arr)
-## [1] 3 4 2
-dimnames(arr) &lt;- list( c(&quot;r1&quot;, &quot;r2&quot;, &quot;r3&quot;), c(&quot;c1&quot;, &quot;c2&quot;, &quot;c3&quot;, &quot;c4&quot;),c(&quot;a1&quot;, &quot;a2&quot;))
-
-arr
-## , , a1
-## 
-##    c1 c2 c3 c4
-## r1  1  4  7 10
-## r2  2  5  8 11
-## r3  3  6  9 12
-## 
-## , , a2
-## 
-##    c1 c2 c3 c4
-## r1 13 16 19 22
-## r2 14 17 20 23
-## r3 15 18 21 24</code></pre>
-<p>The extension for <code>c()</code> for matrices is <code>cbind()</code> and <code>rbind()</code>. Similarly, the package abind provides the function <code>abind()</code>. For transposing a matrix in R the function <code>t()</code> is available and for the array counterpart the function aperm. To check if an object is a matrix / array the functions <code>is.matrix()</code> / <code>is.array()</code> can be used. Similarly coercion to matrices and arrays can be performed using <code>as.matrix()</code> / <code>as.array()</code>.</p>
+fibo.new[1]
+## [1] 987</code></pre>
 </div>
-<div id="lists" class="section level2">
-<h2>Lists</h2>
-<p>Lists (“generic vectors”) are another kind of “one-dimensional” data objects. However, while in an atomic vector all elements must be of the same <em>type</em>, a list can contain elements of different types. In fact, lists have elements, each of whichcan contain any type of R object, i.e. the elements of a list do not have to be of the same type. A list can even contain vectors or lists.</p>
-<p>A list is initialized by the <code>list()</code> function.</p>
-<pre class="r"><code># initialize a list
-lst &lt;- list(&quot;Logical_Vector&quot; = vec_log, 
-             &quot;Integer_Vector&quot; = vec_int, 
-             &quot;Double_Vector&quot; = vec_dou,
-             &quot;Character_Vector&quot; = vec_chr, 
-             &quot;Result&quot; = TRUE)
-</code></pre>
-<p>Use the structure funtion to get a detailed overvier over its elements</p>
-<pre class="r"><code>str(lst)
-## List of 5
-##  $ Logical_Vector  : logi [1:7] TRUE TRUE TRUE TRUE TRUE TRUE ...
-##  $ Integer_Vector  : int [1:7] 1 0 1 2 3 0 2
-##  $ Double_Vector   : num [1:7] 1 0 1 2 3 0 2
-##  $ Character_Vector: chr [1:7] &quot;Monday&quot; &quot;Tuesday&quot; &quot;Wednesday&quot; &quot;Thursday&quot; ...
-##  $ Result          : logi TRUE</code></pre>
-<p>List elements are accessed through three different indexing operations.</p>
-<ol style="list-style-type: decimal">
-<li><code>[ ]</code></li>
-<li><code>[[ ]]</code></li>
-<li><code>$</code></li>
-</ol>
-<pre class="r"><code>lst[1]
-## $Logical_Vector
-## [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-
-lst[[1]]
-## [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-
-lst$Logical_Vector
-## [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
-<p>The first one returns subsets a list, the other two options extract list components. The difference is subtle. A subset of a list is always a list itself, possibly of length 1.</p>
-<pre class="r"><code>class(lst[1])
-## [1] &quot;list&quot;
-
-class(lst[[1]])
-## [1] &quot;logical&quot;
-
-class(lst$Logical_Vector)
-## [1] &quot;logical&quot;</code></pre>
-<p>Just like vectors, lists can be concatenated using the <code>c()</code> function.</p>
-<p>Lists have the same attributes as atomical vectors: length, names, ty</p>
-</div>
-<div id="factors" class="section level2">
-<h2>Factors</h2>
-<p>Factors are used to describe items that can have a finite number of values (gender, social class, etc.). Factors are currently implemented using an integer array to specify the actual <em>levels</em> and a second array of names (<em>labels</em>) that are mapped to the integers. Factors have a class attribute which has the value <em>factor</em> which makes it behave differently compared to standard integer vector.</p>
-<p>A factor is usually created with the function factor.</p>
-<pre class="r"><code>fac &lt;- factor(c(&quot;green&quot;, &quot;green&quot;, &quot;blue&quot;, &quot;green&quot;, &quot;blue&quot;))</code></pre>
-<p>A factor has its own attributes</p>
-<pre class="r"><code>class(fac)
-## [1] &quot;factor&quot;
-levels(fac)
-## [1] &quot;blue&quot;  &quot;green&quot;
-labels(fac)
-## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot;</code></pre>
-<p>Factors are indexed in the same manner atomic vectors are indexed. However, factor vectors cannot be concatenated or assigned values like atomic vectors.</p>
-<pre class="r"><code># assignment idiosyncracies
-fac[2] &lt;- &quot;green&quot;
-fac[2] &lt;- &quot;red&quot;
-## Warning in `[&lt;-.factor`(`*tmp*`, 2, value = &quot;red&quot;): invalid factor level,
-## NA generated
-
-# concatenation idiosyncracies
-fac_1 &lt;- factor(c(&quot;green&quot;, &quot;green&quot;, &quot;blue&quot;))
-fac_2 &lt;- factor(c(&quot;green&quot;, &quot;blue&quot;, &quot;blue&quot;))
-
-c(fac_1, fac_2)
-## [1] 2 2 1 2 1 1
-factor(c(fac_1, fac_2), labels = c(&quot;green&quot;, &quot;blue&quot;))
-## [1] blue  blue  green blue  green green
-## Levels: green blue</code></pre>
-</div>
-<div id="data-frames" class="section level2">
-<h2>Data Frames</h2>
-<p>Data frames are the most widely used structures in statistics. A data frame is a list of vectors, factors, and/or matrices all having the same length (number of rows in the case of matrices). It is, thus, a “two-dimensional” and shares some characteristics of matrices. Hence it shares properties of both vectors and matrices.</p>
-<p>A <em>data frame</em> is initialized by means of the function <code>data.frame()</code>.</p>
-<pre class="r"><code>df &lt;- data.frame(V1 = 1:5, V2 = c(&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;a&quot;, &quot;d&quot;))
-str(df)
-## 'data.frame':    5 obs. of  2 variables:
-##  $ V1: int  1 2 3 4 5
-##  $ V2: Factor w/ 3 levels &quot;a&quot;,&quot;b&quot;,&quot;d&quot;: 1 1 2 1 3</code></pre>
-<p>Since data frames are a mixture between lists and matrices, they have the attributes of both. For example the function <code>length()</code> returns the number of list components, which is the number of columns and hence the same as <code>ncol()</code>. While <code>nrow()</code> returns the the number of rows. Following the same reasoning, <code>names()</code> gives the names of the vectors which is the same as colnames. <code>rownames()</code> in turn gives the rownames.</p>
-<pre class="r"><code>length(df)
+<div id="repeat" class="section level3">
+<h3><code>repeat</code></h3>
+<p>The <code>repeat</code> statement causes repeated evaluation of the body until a break is specifically requested. This means that you need to be careful when using repeat because of the danger of an infinite loop. The syntax of the repeat loop is</p>
+<pre class="r"><code>repeat expression</code></pre>
+<p>When using <code>repeat</code>, expression must be a grouped expression. You need to both perform some computation and test whether or not to break from the loop. This usually requires at least two expressions.</p>
+<pre class="r"><code>i &lt;- 1
+repeat {
+  print(i)
+  i &lt;- i + 1
+  if (i == 6) break
+}
+## [1] 1
 ## [1] 2
-dim(df)
-## [1] 5 2
+## [1] 3
+## [1] 4
+## [1] 5</code></pre>
+<blockquote>
+<p>Excercise 3 : Calculate the largest Fibonacci number smaller than 1000 using the repeat() loop.</p>
+</blockquote>
+<pre class="r"><code>fibo.new &lt;- c(1,1)
 
-names(df)
-## [1] &quot;V1&quot; &quot;V2&quot;
-colnames(df)
-## [1] &quot;V1&quot; &quot;V2&quot;
-rownames(df)
-## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot;</code></pre>
-<p>Lists, vectors and matrices can be coerced to data frames if it is appropriate. For lists this means if not all objects have the same “length”.</p>
-<pre class="r"><code>vec_1 &lt;- 1:5
-lst_1 &lt;- list(vec_1 = vec_1, vec_2 = letters[c(1,2,3,2,1)])
-lst_2 &lt;- list(vec_1 = vec_1, vec_2 = letters[c(1,2,3,2,1,3)])
-str(as.data.frame(vec_1))
-## 'data.frame':    5 obs. of  1 variable:
-##  $ vec_1: int  1 2 3 4 5
+repeat {
+  fibo.old &lt;- fibo.new
+  fibo.new[1] &lt;- fibo.old[2]
+  fibo.new[2] &lt;- fibo.old[1] + fibo.old[2]
+  if (fibo.new[2] &gt; 1000) break
+}
 
-str(as.data.frame(mat))
-## 'data.frame':    2 obs. of  3 variables:
-##  $ A: int  1 2
-##  $ B: int  3 4
-##  $ C: int  5 6
-
-str(as.data.frame(lst_1))
-## 'data.frame':    5 obs. of  2 variables:
-##  $ vec_1: int  1 2 3 4 5
-##  $ vec_2: Factor w/ 3 levels &quot;a&quot;,&quot;b&quot;,&quot;c&quot;: 1 2 3 2 1</code></pre>
-<p>The basic functions to combine two data frames (works similar with matrices) are cbind and rbind. When combining column-wise, then the numbers of rows must match and row names are ignored (hence observations need to be in the same order). When combining row-wise. The number of columns and their names must match. For more advanced combining see the function merge.</p>
+fibo.new[1]
+## [1] 987</code></pre>
 </div>
-<div id="null" class="section level2">
-<h2>NULL</h2>
-<p>There is a special object called NULL. It is used whenever there is a need to indicate or specify that an object is absent. It should not be confused with a vector or list of zero length. The NULL object has no type and no modifiable properties. There is only one NULL object in R, to which all instances refer. To test for NULL use is.null. You cannot set attributes on NULL.</p>
-<pre class="r"><code>a &lt;- NULL
-typeof(a)
-mode(a)
-storage.mode(a)</code></pre>
 </div>
 
 

@@ -5,18 +5,22 @@ date: "April 4, 2018"
 output: html_document
 ---
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(prompt = "true", strip.white=TRUE, comment = NA, collapse=TRUE, cache = TRUE)
+```
+
 Data Visualization is an integral part of data analysis. It is used both for exploratory purposes as well as an explanatory purposes. The first gives you insight about the data, lets you generate hypothesis about the data, and allows human intuition to participate in the selection of a suitable model for your data. The second purpose for graphical tools is to communicate the results of your analysis to others.  
 
-Excellent resources for graphics are
+Chosing the right graph for your data and illustrating it in the most informative way is a form of art and requires a lot of experience. For inspiration one can look at the following resources
 * the R graph gallery <https://www.r-graph-gallery.com/> (for all kind of graphs)
 * the `vcd` package for visualizing categorical data.
 
 R has several graphic systems to produce graphs which follow different philosophies.
 
-1. Base R Graphics
+1. Base R graphics
 2. Trellis plots (package `lattice`)
-3. Grammar of Graph plots  
-4. Grid  
+3. Grammar of Graph plots (package `ggplot2`)
+4. Grid graphics
 
 Out of personal preference we will cover two graphic systems: the standard base R and `ggplot2`. Trellis plots are provided via the package `lattice` and follow the design ideas of Bill Cleveland. The package `grid` provides tools to create graphic scenes. Though the normal user won't really need it since this produces plots basically from scratch. But it can also be used to add output to graphs made with `lattice`.
 
@@ -36,13 +40,11 @@ Base R graphics functions can be divided into three groups:
 * Low-level plotting functions (to add information to an existing plot.)
 * Interactive graphics functions (to add or extract information to / from an existing plot using devices as a mouse.)
     
-High-level plotting commands create a complete plot for the data passed on. They create always a new plot and overwrite if necessary the last one. High plotting commands are generally generic functions which produce different types of plots depending on the class of the data to plot.  
-
-They also add if appropriate default axes, labels and so on to the plot unless requested otherwise.
+High-level plotting commands create a complete plot for the data passed on. They create always a new plot and overwrite if necessary the last one. High plotting commands are generally generic functions which produce different types of plots depending on the class of the data to plot. High-level ploting commands have default values for axes, labels, etc depending on the type of plot.
 
 ### High-level plotting commands
 
-The main plotting function is `plot`. It has methods for most classes. To get an overview see `methods(plot)`. However, there are many other high-level plotting commands. Let us have a look at these ordered by the application. 
+The main plotting function is `plot`. It has methods for most classes. To get an overview see `methods(plot)`. However, there are many other high-level plotting commands. Let us have a look at these ordered the characteristics of the data. 
 
 ### Univariate continuous variables
 
@@ -58,9 +60,10 @@ x <- rnorm(100)
 boxplot(x)
 ```
 
-`plot(x)` produces a plot of the density estimate if `x` is of type `class`.
+`plot(x)` produces a plot of the density estimate if `x` is of class `density`.
 ``` {r fig.align="center", fig.width=5}
 x <- density(rnorm(100))
+class(x)
 plot(x)
 ```
 
@@ -106,7 +109,6 @@ pie(table(fac))
 ```
 
 
-
 ### Covariation of two continuous variables
 
 `plot(x,y)` produces a scatter plot if `x` and `y` are numeric
@@ -123,17 +125,12 @@ For several continuous variables we can plot pairwise scatterplots of all pairs 
 df <- data.frame("x"=rnorm(100), y=rpois(100, lambda = 1), z=rexp(100))
 pairs(df)
 ```
-`coplot(x1~x2 | x3)` produces a number of scatterplots of x1 against x2, given values of x3 (in case x3 is a factor it produces a scatter plot for each factor level)
-``` {r fig.align="center", fig.width=5}
-coplot(lat ~ long | depth, data = quakes)
-```
 
 
 `matplot(X,Y)` plots the columns of the matrix X against the columns of matrix Y.
 ``` {r fig.align="center", fig.width=5}
 iS <- iris$Species == "setosa"
 iV <- iris$Species == "versicolor"
-op <- par(bg = "bisque")
 matplot(c(1, 8), c(0, 4.5), type =  "n", xlab = "Length", ylab = "Width",
         main = "Petal and Sepal Dimensions in Iris Blossoms")
 matpoints(iris[iS,c(1,3)], iris[iS,c(2,4)], pch = "sS", col = c(2,4))
@@ -164,7 +161,6 @@ boxplot(x~y)
 ```
 
 
-
 ### Other plots
 
 `plot(x~y1 + y2 + y3)` produces a series of plots where  `x` is plotted against each term of the right side of the formula separately. The type of the plot depends then on the type of arguments.
@@ -181,11 +177,6 @@ par(mfrow = c(2,2), oma = c(0, 0, 1.1, 0))
 plot(lm.D9)
 ```
 
-`stem(x)` plots a stem and leaf plot.
-
-  
-
-
 
 `dotchart(x)` plots a dotchart.
 ``` {r fig.align="center", fig.width=5}
@@ -193,14 +184,13 @@ dotchart(VADeaths, main = "Death Rates in Virginia - 1940")
 ```
 
 
-
-
-
-
-
-
 `curve(expr)` draws the given expression.
-
+``` {r fig.align="center", fig.width=10}
+par(mfrow=c(1,2))
+curve(sin, -2*pi, 2*pi, xname = "t")
+curve(x^3 - 3*x, -2, 2)
+curve(x^2 - 2, add = TRUE, col = "violet")
+```
 
 ### Three dimensional data
 
@@ -261,6 +251,16 @@ plotting commands to do so. Here is a selection of some of them. However, they d
 - `"S"`: step function, bottom of the vertical defines the point.
 - `"n"`: no plotting, plots however the default axes and coordinates according to the data (might be needed in order to continue with low-level plotting commands).
 
+```{r fig.align="center", fig.width=5}
+library(beeswarm)
+df <- data.frame("x"=c(rnorm(50, mean=1), rnorm(50)), "y"=c(rep("A", 50), rep("B", 50)))
+
+boxplot(x~y, data = df, axes = FALSE,
+        xlab = "Groups", ylab = "Values", main = "Boxplots", sub = "Subtitle")                                                                
+beeswarm(x~y, data = df, add = TRUE, col = "grey") 
+```
+
+
 ### Low-level plotting functions
 
 Low-level plotting commands add additional information (like extra points, lines, legend, ...) to an existing plot. A non-exhaustive list includes:
@@ -284,17 +284,51 @@ The function `abline` is however often more convenient to add straight mathemati
 
 - `legend(x,y,legend,...)` adds a legend to a specified position in the plot.  
 
-In order to let R know what is the "connection" to the graph, at least one of the following options has to be specified. The specification `v` must have the same length as legend.  
+
+
 
 - `fill = v` colours of filled boxes.
-- `col = v`  colours of points or lines.
 - `lty = v`  line styles.
 - `lwd = v`  line widths.
+- `col = v`  colours of points or lines.
 - `pch = v`  plotting characters.
+
+The standard colors and plotting characters an be seen in the following figure
+
+```{r }
+plot(1,1,xlim=c(1,10),ylim=c(0,5),type="n", axes=FALSE)
+points(1:9,rep(4.5,9),cex=1:9,col=1:9,pch=0:8)
+text(1:9,rep(3.5,9),labels=paste(0:9),cex=1:9,col=1:9)
+points(1:9,rep(2,9),pch=9:17)
+text((1:9)+0.25,rep(2,9),paste(9:17))
+points(1:8,rep(1,8),pch=18:25)
+text((1:8)+0.25,rep(1,8),paste(18:25))
+```
 
 Note:  
 Also mathematical symbols and formulae can be added as text, then the labels are rather expressions. For details see help for `plotmath`.
 
+```{r fig.align="center", fig.width=5}
+library(beeswarm)
+df <- data.frame("x"=c(rnorm(50, mean=1), rnorm(50)), "y"=c(rep("A", 50), rep("B", 50)))
+
+boxplot(x~y, data = df, axes = FALSE,
+        xlab = "Groups", ylab = "Values", main = "Boxplots", sub = "Subtitle")                                                                
+beeswarm(x~y, data = df, add = TRUE, col = "grey")                                                                
+axis(side=1, at = c(1,2), labels = c("A", "B"))
+axis(side=2, at = c(-1,0,1,2), labels = c("-1.0", "0.0", "1.0", "2.0"), las = 2)
+```
+
+```{r fig.align="center", fig.width=5}
+df <- data.frame(rbind(MASS::mvrnorm(100, mu = c(1,0), Sigma = matrix(c(1,0.7,0.7,1), ncol=2)),
+                   MASS::mvrnorm(100, mu = c(-1,1), Sigma = matrix(c(1,0.0,0.0,1), ncol=2))),
+                 "group" = c(rep("A", 100), rep("B", 100)))
+plot(df$X1, df$X2, xlim = c(-4,4), ylim = c(-4,4),
+     col=c(rep("green", 100), rep("blue", 100)),
+     pch = 2, xlab = "Variable 1", ylab="Variable 2")
+abline(h=0, col="black")
+legend("topleft", legend=c("Group A", "Group B"), col = c("green", "blue"), pch = c(1,1))
+```
 
 ### Interactive plotting functions
 
@@ -308,7 +342,6 @@ But one can also use interactive functions not only to add something to the plot
 
 More often the `locator` function is used to position text on a plot. Then the usage is for example within the `text` function:  
 `text(locator(1),"text")`   
-
 
 - `identify()` can be used to highlight a certain point in a plot the function
 
@@ -332,7 +365,15 @@ plot(x,y, pch="*")
 ```
 produces a scatter plot with * as plotting character instead of using a point.
 
-With graphical parameters one can change almost every aspect of a graphic. Submitting only `par()` gives a list with all graphical parameters and their current settings. The most important graphic parameters are: 
+With graphical parameters one can change almost every aspect of a graphic. Submitting only `par()` gives a list with all graphical parameters and their current settings. If one want to change the parameters for a number of plots and wnats to return to the default setting afterwards, one can do the following
+
+```
+def.par <- par(no.readonly = TRUE) # save default, for resetting...
+# block of commands
+par(def.par)  #- reset to default
+```
+
+The most important graphic parameters are: 
 
 - `pch` specifies the character used for the plotting. The character can be directly specified submitting it in quotes or indirectly by providing an integer between 0 and 18.
 - `lty` specifies the line type with an integer from 1 onwards.
@@ -361,24 +402,56 @@ For instance:
 The outer margins (by default 0) can be set using the `oma` and `omi` arguments analogous as the `mar` and `mai` arguments.
 Text to the outer margins can be added using the `mtext` function.
 
-#### Multiple plots in one figure
+### Multiple plots in one figure
 
-- `mfrow` and `mfcol` allow to put several figures into one window. Each figure still has its own plotting area and margins, but in addition one can add optionally a surrounding overall outer margin. To do that one has to define an array which sets the size of the multiple figures environment. The two functions  `mfcol` and ` mfrow` define such an environment, the only difference is, that `mfcol` fills the array by columns and `mfrows` by rows.  
+There are two possibilities to place severall plots in one figure in base R. The first is by simply setting the `mfrow` or `mfcol` paramters, the second is using the function `layout()`.
+
+`mfrow` and `mfcol` allow to put several figures into one window. Each figure still has its own plotting area and margins, but in addition one can add optionally a surrounding overall outer margin. To do that one has to define an array which sets the size of the multiple figures environment. The two functions  `mfcol` and ` mfrow` define such an environment, the only difference is, that `mfcol` fills the array by columns and `mfrows` by rows.  
+
+```{r fig.align="center", fig.width=10}
+par(mfrow=c(1,2))
+curve(sin, -2*pi, 2*pi)
+curve(tan, -2*pi, 2*pi)
+```
+
+There also exists a special funcion to specify complex plot arrangements: `layout()`. 
+```
+layout(mat, widths = rep.int(1, ncol(mat)),
+       heights = rep.int(1, nrow(mat)), respect = FALSE)
+```
+It divides the device up into as many rows and columns as there are in matrix `mat`, with the column-widths and the row-heights specified in the respective arguments.
+
+```{r fig.align="center", fig.width=5}
+x <- pmin(3, pmax(-3, stats::rnorm(50)))
+y <- pmin(3, pmax(-3, stats::rnorm(50)))
+xhist <- hist(x, breaks = seq(-3,3,0.5), plot = FALSE)
+yhist <- hist(y, breaks = seq(-3,3,0.5), plot = FALSE)
+top <- max(c(xhist$counts, yhist$counts))
+xrange <- c(-3, 3)
+yrange <- c(-3, 3)
+nf <- layout(matrix(c(2,0,1,3),2,2,byrow = TRUE), c(3,1), c(1,3), TRUE)
+layout.show(nf)
+
+par(mar = c(3,3,1,1))
+plot(x, y, xlim = xrange, ylim = yrange, xlab = "", ylab = "")
+par(mar = c(0,3,1,1))
+barplot(xhist$counts, axes = FALSE, ylim = c(0, top), space = 0)
+par(mar = c(3,0,1,1))
+barplot(yhist$counts, axes = FALSE, xlim = c(0, top), space = 0, horiz = TRUE)
+```
 
 
 ## Device drivers
 
-R can create for almost all types of driver display or printing devices graphics. However, R has to be told before making the figure, which device should be applied - therefore the device driver has to be specified.  
-`help(Devices)`  
-provides a list with all possible devices. The special device of interest is activated by calling its name and specifying the necessary options in the parentheses.  
+R can create for almost all types of driver display or printing devices graphics. However, R has to be told before making the figure, which device should be applied - therefore the device driver has to be specified.
+
+`help(Devices)` provides a list with all possible devices. The special device of interest is activated by calling its name and specifying the necessary options in the parentheses.  
 For instance:
 ```{r, eval=FALSE}
 jpeg(file="C:/Temp/figure.jpg", 
      width=5, height=4, bg="white")  
 ```
-produces a .jpg file.  
-
-To finish with a device, one should submit   
+produces a .jpg file. To finish with a device, one should submit   
 ```{r, eval=FALSE}
 dev.off()
 ```
