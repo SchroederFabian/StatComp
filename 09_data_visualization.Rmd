@@ -394,7 +394,7 @@ The most important graphic parameters are:
 There are two arguments to control the margins. The argument `mai` sets the margins measured in inches, whereas the argument `mar` measures them in number of text lines. The margins itself are divided into four parts: the bottom is part 1, left part 2, top part 3 and light part 4.
 The different parts are addressed with the corresponding index of the margin vector.   
 For instance:  
-`mar=c(1,2,3,4)`  (1 inch bottom, 2 inches left, 3 inches top, 4 inches right)  
+`mai=c(1,2,3,4)`  (1 inch bottom, 2 inches left, 3 inches top, 4 inches right)  
 `mar=c(1,2,3,4)`  (1 line bottom, 2 lines left, 3 lines top, 4 lines right)
 
 <center> ![](/home/Fabian2/Desktop/StatComp/figures/margins2.png) </center>
@@ -448,20 +448,14 @@ R can create for almost all types of driver display or printing devices graphics
 `help(Devices)` provides a list with all possible devices. The special device of interest is activated by calling its name and specifying the necessary options in the parentheses.  
 For instance:
 ```{r, eval=FALSE}
-jpeg(file="C:/Temp/figure.jpg", 
-     width=5, height=4, bg="white")  
+jpeg(file="C:/Temp/figure.jpg", width=5, height=4, bg="white")  
 ```
 produces a .jpg file. To finish with a device, one should submit   
 ```{r, eval=FALSE}
 dev.off()
 ```
 
-In R several graphic devices can be used at the same time. To start a new device one calls its name. E.g.   
-`windows()`   
-opens a new graphic windows when running R under windows.   
-
-Always the last opened device is the active one. To reactivate an older window one has to use the function `dev.set`.  
-`dev.set(1)` would for example reactivate the first device. Plotting commands affect only the active device.
+In R several graphic devices can be used at the same time. To start a new device one calls its name. E.g. `windows()` opens a new graphic windows when running R under windows. Always the last opened device is the active one. To reactivate an older window one has to use the function `dev.set`. `dev.set(1)` would for example reactivate the first device. Plotting commands affect only the active device.
 
  
 

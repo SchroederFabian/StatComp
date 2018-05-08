@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(prompt = "true", strip.white=TRUE, comment = NA, collapse=TRUE, cache = TRUE, fig.align="center", fig.width=5)
+knitr::opts_chunk$set(prompt = "true", strip.white=TRUE, comment = NA, collapse=TRUE, cache = TRUE, fig.align="center")
 ```
 
 ## ggplot2 Graphics
@@ -24,7 +24,7 @@ There are seven grammatical elements in total, three are essential:
 
 The non-essential ones include:
 
-- facets, 
+- facets 
 - statistics
 - coordinates
 - themes
@@ -34,7 +34,7 @@ The non-essential ones include:
 A good reference for ggplot can be found at <http://ggplot2.tidyverse.org/reference/>.
 
 
-## Principles of ggplot
+## Principles of ggplot2
 
 All plots are generated with the same function: `ggplot()`. However, this function only initializes a ggplot object. It can be used to declare the input data frame for a graphic and to specify the set of plot aesthetics intended to be common throughout all subsequent layers unless specifically overridden.
 
@@ -62,7 +62,7 @@ There are three common ways to invoke `ggplot()`:
 
 `ggplot()`
 
-The first method is recommended if all layers use the same data and the same set of aesthetics, although this method can also be used to add a layer using data from another data frame. See the first example below. The second method specifies the default data frame to use for the plot, but no aesthetics are defined up front. This is useful when one data frame is used predominantly as layers are added, but the aesthetics may vary from one layer to another. The third method initializes a skeleton ggplot object which is fleshed out as layers are added. This method is useful when multiple data frames are used to produce different layers, as is often the case in complex graphics.
+The first method is recommended if all layers use the same data and the same set of aesthetics, although this method can also be used to add a layer using data from another data frame. The second method specifies the default data frame to use for the plot, but no aesthetics are defined up front. This is useful when one data frame is used predominantly as layers are added, but the aesthetics may vary from one layer to another. The third method initializes a skeleton ggplot object which is fleshed out as layers are added. This method is useful when multiple data frames are used to produce different layers, as is often the case in complex graphics.
 
 In order to see something, we have add "layers". These are added by using the `+` operator. Behind the scenes it calls the `layer()` function to create a new layer. You will never use the layer function, but it is good for your understanding of how ggplot2 works.
 
@@ -78,23 +78,21 @@ p + layer(
 
 This call fully specifies the five components to the layer:
 
-- `mapping`: A set of aesthetic mappings, specified using the `aes()` function and combined with the plot defaults as described in aesthetic mappings. If `NULL`, uses the default mapping set in ggplot().
+- `mapping`: A set of aesthetic mappings, specified using the `aes()` function and combined with the plot defaults. If `NULL`, uses the default mapping set in ggplot().
 
-- `data`: A dataset which overrides the default plot dataset. It is usually omitted (set to NULL), in which case the layer will use the default data specified in ggplot(). The requirements for data are explained in more detail in data.
+- `data`: A dataset which overrides the default plot dataset. It is usually omitted (set to NULL), in which case the layer will use the default data specified in ggplot().
 
-- `geom`: The name of the geometric object to use to draw each observation. Geoms are discussed in more detail in geom, and the toolbox explores their use in more depth. Geoms can have additional arguments. All geoms take aesthetics as parameters. If you supply an aesthetic (e.g. colour) as a parameter, it will not be scaled, allowing you to control the appearance of the plot, as described in setting vs. mapping. You can pass params in ... (in which case stat and geom parameters are automatically teased apart), or in a list passed to geom_params.
+- `geom`: The name of the geometric object to use to draw each observation. Geoms can have additional arguments. All geoms take aesthetics as parameters. If you supply an aesthetic (e.g. colour) as a parameter, it will not be scaled, allowing you to control the appearance of the plot.
 
-- `stat`: The name of the statistical tranformation to use. A statistical transformation performs some useful statistical summary is key to histograms and smoothes. To keep the data as is, use the “identity” stat. Learn more in statistical transformations. You only need to set one of stat and geom: every geom has a default stat, and every stat a default geom. Most stats take additional parameters to specify the details of statistical transformation. You can supply params either in ... (in which case stat and geom parameters are automatically teased apart), or in a list called stat_params.
+- `stat`: The name of the statistical tranformation to use. A statistical transformation performs some useful statistical summary is key to histograms and smoothes. To keep the data as is, use the “identity” stat. You only need to set one of stat and geom: every geom has a default stat, and every stat a default geom. Most stats take additional parameters to specify the details of statistical transformation. 
 
-- `position`: The method used to adjusting overlapping objects, like jittering, stacking or dodging. More details in position.
+- `position`: The method used to adjusting overlapping objects, like jittering, stacking or dodging.
 
 It’s useful to understand the `layer()` function so you have a understanding of the layer object. But you’ll rarely use the full `layer()` call because it’s so verbose. Instead, you’ll use the shortcut geom_ functions: `geom_point(mapping, data, ...)` is exactly equivalent to `layer(mapping, data, geom = "point", ...)`.
 
-```{r}
+```{r fig.width=5}
 p + geom_point()
 ```
-
-Five components of every layer
 
 ### Data
 
@@ -113,11 +111,18 @@ ggplot(mpg, aes(displ, hwy)) +
 
 ```
 
+### Aesthetics
 
+The aesthetic mappings, defined with `aes()`, describe how variables are mapped to visual properties or aesthetics. In simpler words, an aesthetic is "something you can see". They include
 
-### Aesthetic mappings
+* position (i.e., on the x and y axes)
+* color
+* fill (the "inside" of a plotting character)
+* shape (of points)
+* linetype
+* size
 
-The aesthetic mappings, defined with aes(), describe how variables are mapped to visual properties or aesthetics. aes() takes a sequence of aesthetic-variable pairs like this: 
+`aes()` takes a sequence of aesthetic-variable pairs like this: 
 
 ```{r eval = FALSE}
 aes(x = displ, y = hwy, colour = class)
@@ -128,7 +133,7 @@ Here we map x-position to `displ`, y-position to `hwy`, and colour to `class`. T
 aes(displ, hwy, colour = class)
 ```
 
-Aesthetic mappings can be supplied in the initial ggplot() call, in individual layers, or in some combination of both. All of these calls create the same plot specification:
+Aesthetic mappings can be supplied in the initial `ggplot()` call, in individual layers, or in some combination of both. All of these calls create the same plot specification:
 
 ```{r eval = FALSE}
 ggplot(mpg, aes(displ, hwy, colour = class)) + 
@@ -143,12 +148,11 @@ ggplot(mpg) +
 
 The aesthetics set in the `ggplot()` function are the default for all other layers. You can, however, add, override, or even remove mappings (e.g. `aes(y=NULL)`) in the layers. 
 
-```{r }
+```{r warning=FALSE}
 par(mfrow=c(1,2))
 ggplot(mpg, aes(displ, hwy, colour = class)) + 
   geom_point() + 
   geom_smooth(se = FALSE)
-
 ggplot(mpg, aes(displ, hwy)) + 
   geom_point(aes(colour = class)) + 
   geom_smooth(se = FALSE)
@@ -157,25 +161,226 @@ ggplot(mpg, aes(displ, hwy)) +
 
 ### Geoms
 
-### Stats
+Geometric objects are the actual marks we put on a plot. We have already seen a few examples of geoms: `geom_points`, `geom_line`, and `geom_smooth`, however, there are many more. You can get a list of available geometric objects by the `help.search()` command:
 
-### Position Adjustments
+```{r }
+help.search("geom_", package = "ggplot2")
+```
+
+An excellent overview can be found at ![http://sape.inf.usi.ch/quick-reference/ggplot2/geom]
+
+There are a few rules to using geoms:
+
+* A plot must have at least one geom; there is no upper limit. 
+* You can add a geom to a plot using the `+` operator
+* Each type of geom accepts only a subset of all aesthetics - refer to the geom help ape to see what mappings each geom accepts. E.g. `geom_point` requires mappings for x and y, all others are optional. The `geom_text` accepts a `labels` mapping.
 
 
-### Statistics Layer
+### Statistical Transformations
 
-There are two categories of functions: 
-  - those called from within a geom
-  - those called independently
+Some plot types (such as scatterplots) do not require transformations–each point is plotted at x and y coordinates equal to the original value. Other plots, such as boxplots, histograms, prediction lines etc. require statistical transformations: For a boxplot the y values must be transformed to the median and 1.5(IQR). For a histogram, the x values must be transformed to the bin.
+
+Each geom has a default statistic, but these can be changed. For example, the default statistic for `geom_bar` is `stat_bin`.
+
+```{r }
+args(geom_histogram)
+args(stat_bin)
+```
+
+Arguments to stat_ functions can be passed through geom_ functions. This can be slightly annoying because in order to change it you have to first determine which stat the geom uses, then determine the arguments to that stat.
+
+```{r }
+housing <- read.csv("/home/Fabian2/Desktop/StatCompMeta/Rgraphics/dataSets/landdata-states.csv")
+head(housing[1:5])
+
+p2 <- ggplot(housing, aes(x = Home.Value))
+p2 + geom_histogram()
+```
+
+by changing the `binwidth` argument in the `stat_bin` function we can obtain:
+
+```{r }
+p2 + geom_histogram(stat = "bin", binwidth=4000)
+```
 
 
 
+
+### Coordinates
+
+The coordinate system of a plot, together with the x and y position `scale`, determines the location of geoms. There are a few options:
+
+
+* `coord_cartesian` - (default) cartesian coordinate system (x horizontal from left to right, y vertical from bottom to top)
+* `coord_flip` - flipped cartesian coordinate system (x vertical from bottom to top, y horizontal from left to right)
+* `coord_trans` - transformed cartesion coordinate system, e.g. log transform
+* `coord_equal` - forces a fixed ratio of the physical representations on the x and y axis
+* `coord_polar` - polar coordinate system; the x (or y) scale is mapped to the angle (theta)
+* `coord_map` - various map projections 
+
+```{r }
+d <- data.frame(height = c(1,2,2,3,4), weight = c(1,3,4,4,2))
+p <- ggplot() +
+  geom_line(data=d, mapping=aes(x=height, y=weight)) +
+  geom_point(data=d, mapping=aes(x=height, y=weight), size=8, fill="white", shape=21) +
+  geom_text(data=d,mapping=aes(x=height, y=weight, label=seq(1,nrow(d))))
+
+```
+
+```{r }
+p + coord_cartesian()
+p + coord_flip()
+p + coord_trans(x="log10", y="log10")
+p + coord_equal()
+p + coord_polar(theta="x")
+p + coord_polar(theta="y")
+```
+
+
+
+
+
+
+### Scales: Controlling Aesthetic Mapping
+
+Aesthetic mapping (i.e., with `aes()`) only says that a variable should be mapped to an aesthetic. It doesn’t say how that should happen. For example, when mapping a variable to shape with `aes(shape = x)` you don’t say what shapes should be used. Similarly, `aes(color = z)` doesn’t say what colors should be used. Describing what colors/shapes/sizes etc. to use is done by modifying the corresponding scale. In `ggplot2` scales include
+
+* position
+* color and fill
+* size
+* shape
+* line type
+
+Scales are modified with a series of functions using a `scale_<aesthetic>_<type>` naming scheme. To get an overview type
+
+```{r }
+help.search("scale_", package = "ggplot2")
+```
+
+Let us consider an example of a dopplot showing the distribution of home values by Date and State.
+
+```{r }
+
+p3 <- ggplot(housing,
+             aes(x = State,
+                 y = Home.Price.Index)) + 
+        theme(legend.position="top",
+              axis.text=element_text(size = 6))
+(p4 <- p3 + geom_point(aes(color = Date),
+                       alpha = 0.5,
+                       size = 1.5,
+                       position = position_jitter(width = 0.25, height = 0)))
+```
+
+Now, let us modify the breaks for the x axis and color scales.
+
+```{r }
+p4 + scale_x_discrete(name="State Abbreviation") +
+  scale_color_continuous(name="",
+                         breaks = c(1976, 1994, 2013),
+                         labels = c("'76", "'94", "'13"))
+```
+
+Next, change the low and high values to blue and red.
+
+```{r }
+p4 +
+  scale_x_discrete(name="State Abbreviation") +
+  scale_color_continuous(name="",
+                         breaks = c(1976, 1994, 2013),
+                         labels = c("'76", "'94", "'13"),
+                         low = "blue", high = "red")
+```
+
+
+```{r }
+library(scales)
+p4 +
+  scale_color_continuous(name="",
+                         breaks = c(1976, 1994, 2013),
+                         labels = c("'76", "'94", "'13"),
+                         low = muted("blue"), high = muted("red"))
+```
+
+
+### Faceting
+
+Faceting allows to create multiple graphs for subsets of data. `ggplot2` offers two functions for creating small multiples
+
+* `facet_wrap()`: define subsets as the levels of a single grouping variable
+* `facet_grid()`: define subsets as the crossing of two grouping variables
+
+
+```{r }
+p5 <- ggplot(housing, aes(x = Date, y = Home.Value))
+p5 + geom_line(aes(color = State))
+
+```
+
+
+There are two problems here. First, there are too many states to distinguish each one by color, and secondly, the lines obscure one another.
+
+
+```{r fig.width=7}
+(p5 <- p5 + geom_line() + 
+  facet_wrap(~State, ncol=10))
+
+```
+
+## Themes
+
+The `ggplot2` theme system handles non-data elements such as
+
+* Axis labels
+* Plot backround
+* Facet label backround
+* Legend appearance
+
+All theme options are documented in `?theme`. There are a number of built-in themes, e.g.
+
+* `theme_gray()` (default)
+* `theme_bw()`
+* `theme_classic()`
+
+
+```{r fig.width = 7}
+p5 + theme_linedraw()
+```
+
+
+
+```{r fig.width = 7}
+p5 + theme_light()
+```
+
+Specific theme elements can be overridden using `theme()`.
+
+```{r }
+p5 + theme_minimal() + 
+  theme(text = element_text(color = "turquoise"))
+
+```
+
+
+You can create new themes, as in the the following example:
+
+```{r fig.width=9}
+theme_new <- theme_bw() +
+  theme(plot.background = element_rect(size = 1, color = "blue", fill = "grey"),
+        text=element_text(size = 12, family = "Serif", color = "ivory"),
+        axis.text.y = element_text(colour = "pink"),
+        axis.text.x = element_text(colour = "red"),
+        panel.background = element_rect(fill = "pink"),
+        strip.background = element_rect(fill = "pink"))
+        
+p5 + theme_new
+```
 
 
 ## Examples of ggplot2 plots
 
 
-# Univarite continuous variables
+### Densityplot of a univarite continuous variables
 
 ```{r}
 vec <- data.frame("x"=rnorm(100))
@@ -183,10 +388,18 @@ ggplot(vec, aes(x=x)) +
   geom_histogram(aes(y=..density..)) + 
   geom_rug() +
   stat_function(fun = dnorm, colour = "red",
-                are = list(mean = mean(vec$x), sd = sd(vec$x)))
+                args = list(mean = mean(vec$x), sd = sd(vec$x)))
+```
+
+### Histogram
+
+``` {r fig.align="center", fig.width=5}
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
 ```
 
 
+### QQ Plot
 
 ```{r}
 vec <- data.frame("x"=rnorm(100))
@@ -199,59 +412,21 @@ ggplot(vec, aes(sample=x)) +
 ```
 
 
-
-Aus dem Dokument
-
+### Grouped Dotplot
 ```{r}
-
 library(dplyr)
-
-class <- mpg %>%
+clss <- mpg %>%
   group_by(class) %>%
-  summarise(n = n(), hwy = mean(hwy))
+  dplyr::summarise(n = n(), hwy = mean(hwy))
 
-class$n.spell <- paste0("n = ", class$n)
+clss$n.spell <- paste0("n = ", clss$n)
 
-ggplot(data = mpg, aes(y=hwy, x=class)) + 
+ggplot(data = mpg, aes(y = hwy, x = class)) + 
   geom_jitter() + 
-  geom_point(data = class, aes(x=class, y=hwy), col = "red", size = 4) + 
-  geom_text(data = class, aes(label = n.spell, y = 10 ))
+  geom_point(data = clss, aes(x = class, y = hwy), col = "red", size = 4) + 
+  geom_text(data = clss, aes(label = n.spell, y = 10 ))
 
 ```
-
-
-
-Excercise 1
-
-```{r }
-
-ggplot(mpg) + 
-  geom_point(aes(displ, hwy))
-
-ggplot(data = mpg, mapping = aes(cty, hwy)) + 
- geom_point() +
- geom_smooth()
-
-ggplot(diamonds, aes(carat, price)) + 
-  geom_point(aes(log(brainwt), log(bodywt)), data = msleep)
-
-```
-
-Excercise 2
-
-```{r }
-
-ggplot(mpg) +
-  geom_point(aes(class, cty)) + 
-  geom_boxplot(aes(trans, hwy))
-
-```
-
-
-
-
-
-
 
 ### Univariate categorical data
 
@@ -261,21 +436,25 @@ ggplot(data = diamonds) +
 ```
 
 
-### Univariate continuous data
-
-
-
-``` {r fig.align="center", fig.width=5}
-ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = carat), binwidth = 0.5)
-```
-
 
 
 
 ### Comparison between baseR and gglot2
 
+Compared to base graphics, `ggplot2`
+
+* is more verbose for simple graphics
+* is less verbose for complex / custom graphics
+* does not have methods! (data should always be in a data frame)
+* does not include 3-dimensional graphics (see the `rgl` package)
+* does not include Graph-theory type graphs (see the `igraph` package)
+* does not include interactive graphics (see the `ggvis`)
+
+
+
 A good way to compare to the two philosophies is to create the same plots with both aproaches. Let us have a look at a few excellent examples taken from the blog "Tufte in R" by Lukasz Piwek to be found under ![](http://motioninsocial.com/tufte/#introduction).
+
+
 
 #### Minimal line plot in base graphics
 
@@ -309,34 +488,6 @@ ggplot(d, aes(x,y)) + geom_line() + geom_point(size=3) + theme_tufte(base_size =
            label = c("Per capita\nbudget expandures\nin constant dollars", "5%"))
 ```
 
-#### Dot-dash plot in base graphics
-
-
-``` {r fig.align="center", fig.width=5}
-library(devtools)
-source_url("https://raw.githubusercontent.com/sjmurdoch/fancyaxis/master/fancyaxis.R")
-x <- faithful$waiting
-y <- faithful$eruptions
-plot(x, y, main="", axes=FALSE, pch=16, cex=0.8,
-     xlab="Time till next eruption (min)", ylab="Duration (sec)", 
-     xlim=c(min(x)/1.1, max(x)), ylim=c(min(y)/1.5, max(y)))
-axis(1, tick=F)
-axis(2, tick=F, las=2)
-axisstripchart(faithful$waiting, 1)
-axisstripchart(faithful$eruptions, 2)
-```
-
-
-#### Dot-dash plot in ggplot2
-
-
-``` {r fig.align="center", fig.width=5}
-library(ggplot2)
-library(ggExtra)
-library(ggthemes)
-p <- ggplot(faithful, aes(waiting, eruptions)) + geom_point() + theme_tufte(ticks=F)
-ggMarginal(p, type = "histogram", fill="transparent")
-```
 
 #### Marginal histogram scatterplot with base graphics
 
@@ -369,7 +520,8 @@ ggMarginal(p, type = "histogram", fill="transparent")
 
 ``` {r fig.align="center", fig.width=5, fig.height=12}
 library(devtools)
-install_github("leeper/slopegraph")#install Leeper's package from Github
+#install_github("leeper/slopegraph", force = TRUE)#install Leeper's package from Github
+library(slopegraph)
 data(cancer)
 slopegraph(cancer, col.lines = 'gray', col.lab = 1, col.num = 1,
            xlim = c(-.2,5),
