@@ -6,44 +6,45 @@ output: html_document
 ---
 
 
-## Version Control I
+## What is version control?
 
-![](version_control.gif)
+The merits of an organised version control can best be illustrated by showing what happens when you don't use it. 
 
-## Version Control II
+![](/home/Fabian2/Desktop/StatComp/figures/version_control.gif)
 
-Version control becomes a LOT MORE DIFFICULT if more people are involved!
+
+Version control becomes a *LOT MORE DIFFICULT* when more people are involved!
 
 
 ## What is Git?
 
-![](gitlogo.png){width=150px}
+![](/home/Fabian2/Desktop/StatComp/figures/gitlogo.png){width=150px}
 
 Git is a version control system, originally developed by Linus Torvalds. Its original purpose was to help groups of developers work collaboratively on big software projects. Git manages the evolution of a set of files – called a repository – in a sane, highly structured way.
+
+Good resources can be found at+
+
+[http://happygitwithr.com/](http://happygitwithr.com/)  (by Jenny Bryan)   
+[http://r-pkgs.had.co.nz/git.html](http://r-pkgs.had.co.nz/git.html) (by Hadley Wickham)
 
 
 
 ## What is GitHub?
-![](githublogo.png){width=150px}  
+![](/home/Fabian2/Desktop/StatComp/figures/githublogo.png){width=150px}  
 
 GitHub (like Bitbucket or Gitlab) is a hosting service for git-based projects. They add nice web-based interfaces to traditional Git servers. 
 
 
 ## How does it work?
 
-![](git_repositories.png)
+![](/home/Fabian2/Desktop/StatComp/figures/git_repositories.png)
 
 
 ## A typical workflow
 
-![](gitflow.png)
+![](/home/Fabian2/Desktop/StatComp/figures/gitflow.png)
 
 
-## Good Resources
-
-[http://happygitwithr.com/](http://happygitwithr.com/)  (by Jenny Bryan)   
-
-[http://r-pkgs.had.co.nz/git.html](http://r-pkgs.had.co.nz/git.html) (by Hadley Wickham)
 
 ## Git for the Data Scientist?
 

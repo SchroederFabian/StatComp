@@ -1,0 +1,81 @@
+---
+title: "Version Control with GIT"
+author: "Fabian Schroeder"
+date: "May 15, 2018"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(prompt = "true", strip.white=TRUE, comment = NA, collapse=TRUE, cache = TRUE, fig.align="center", fig.width = 5)
+```
+
+## What is version control?
+
+Version control is a system that records changes to a file or set of files over time so that you can recall specific versions later. The merits of an organised version control can best be illustrated by showing what happens when you don't use it. 
+
+<center> ![](/home/Fabian2/Desktop/StatComp/figures/version_control.gif) </center>
+
+If you want to keep every version of a project, a Version Control System (VCS) is a very wise thing to use. It allows you to revert selected files back to a previous state, revert the entire project back to a previous state, compare changes over time, see who last modified something that might be causing a problem, who introduced an issue and when, and more. Using a VCS also generally means that if you screw things up or lose files, you can easily recover. In addition, you get all this for very little overhead.
+
+You can use it locally on your computer your documenting and safeguarding your own private project, but the real benefits of version control manifest when more than one person is involved in the project. Version control becomes a *LOT MORE DIFFICULT* when more people are involved! If more than one person is involved in a project, you might want to opt for a centralized version control system. 
+
+Many people’s version-control method of choice is to copy files into another directory (perhaps a time-stamped directory, if they’re clever). This approach is very common because it is so simple, but it is also incredibly error prone. It is easy to forget which directory you’re in and accidentally write to the wrong file or copy over files you don’t mean to.
+
+<center> ![](/home/Fabian2/Desktop/StatComp/figures/vc_local.png){width=30%}![](/home/Fabian2/Desktop/StatComp/figures/vc_centralized.png){width=30%}![](/home/Fabian2/Desktop/StatComp/figures/vc_distributed.png){width=30%} </center>
+
+
+## What is Git?
+
+
+
+Git is a version control system, originally developed by Linus Torvalds. Its original purpose was to help groups of developers work collaboratively on big software projects. Git manages the evolution of a set of files – called a repository – in a sane, highly structured way.
+
+![](/home/Fabian2/Desktop/StatComp/figures/gitlogo.png){width=150px}
+
+Good resources can be found at+
+
+[http://happygitwithr.com/](http://happygitwithr.com/)  (by Jenny Bryan)   
+[http://r-pkgs.had.co.nz/git.html](http://r-pkgs.had.co.nz/git.html) (by Hadley Wickham)
+
+
+
+## What is GitHub?
+
+GitHub (like Bitbucket or Gitlab) is a hosting service for git-based projects. They add nice web-based interfaces to traditional Git servers.
+
+![](/home/Fabian2/Desktop/StatComp/figures/githublogo.png){width=150px}  
+
+
+<center> ![](/home/Fabian2/Desktop/StatComp/figures/git_repositories.png)</center>
+
+
+# The Git Terminology
+
+There are a few important concepts that you must know about: commit, push, pull, fork, clone, ...
+
+* repository: The purpose of Git is to manage a project, or a set of files, as they change over time. Git stores this information in a data structure called a repository. The Git repository is stored in the same directory as the project itself, in a subdirectory called .git. A git repository contains, among other things, the following:
+    * A set of commit objects.
+    * A set of references to commit objects, called heads.
+    
+* commit (`git commit`):  Record changes to the repository. A commit object contains three things:
+    * A set of files, reflecting the state of a project at a given point in time.
+    * References to parent commit objects.
+    * An SHA1 name, a 40-character string that uniquely identifies the commit object.
+
+* initialize (`git init`): Create an empty Git repository or reinitialize an existing one
+* pull (`git pull`): Fetch from and integrate with another repository or a local branch
+* push (`git push`): Update remote repository
+* clone (`git clone`): Duplicate a git repo to your local computer
+* branch: Technically, this is simply a pointer to a commit. By modifying an old version of a file you are essentially creating a new branch in your repository. A typical workflow could look like:
+<center> ![](/home/Fabian2/Desktop/StatComp/figures/gitflow.png)</center>
+
+## Git for the Data Scientist?
+
+Let us do an example!
+
+1. Create a new gitHub repository and upload our iris data set project.
+2. Clone the repository on a local computer
+3. Pull, modify, commit and push!
+
+
+

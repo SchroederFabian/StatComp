@@ -18,7 +18,7 @@ data("iris")
 
 This famous dataset [@fisher, @anderson] gives the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species or iris. The species are *Iris setosa, versicolor*, and *virginica*.  
 
-![Illustration of the Variables of the iris data set.](iris.png)
+![Illustration of the Variables of the iris data set.](/home/Fabian2/Desktop/StatComp/figures/iris.png)
 
 Iris is a data frame with 150 cases (rows) and 5 variables (columns) named Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, and Species.
 
