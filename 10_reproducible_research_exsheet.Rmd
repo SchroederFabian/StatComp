@@ -1,0 +1,52 @@
+---
+title: "Excercise Sheet"
+output: pdf_document
+---
+
+1. Open RStudio and create a new RMarkdown File (.Rmd) with the follwing YAML parameter:
+  + Title: The Iris Data Set
+  + Document Type
+  + Default Output Format: PDF
+
+2. Create an R chunk called: load
+
+``` {r load, eval = FALSE, echo = TRUE}
+data("iris")
+library(c("stargazer", "xtable"))
+
+```
+
+3. Make horizontal rule under the title
+
+4. Create the subtitle: Description
+
+5. Print a summary of the dataset using
+``` {r summary1, eval = FALSE, echo = TRUE}
+summary(iris)
+
+```
+
+6. Create a nicer summary using 
+``` {r summary2, eval = FALSE, echo = TRUE}
+options(xtable.comment = FALSE)
+xtable::xtable(summary(iris), type = "latex", comment = FALSE, caption = "Summary of the data set")
+```
+
+7. Create a new section called Scatterplot Matrix and plot
+``` {r plot, eval = FALSE, echo = TRUE}
+plot(iris)
+```
+
+8. Perform a logistic regression analysis and produce a neat table with the output
+``` {r logreg, eval = FALSE, echo = TRUE}
+iris[['Is.Versicolor']] <- as.numeric(iris[['Species']] == 'versicolor')
+iris[['Is.Virginica']] <- as.numeric(iris[['Species']] == 'virginica')
+fit.1 <- glm(Is.Versicolor ~ Petal.Length + Sepal.Length, data = iris)
+fit.2 <- glm(Is.Virginica ~ Petal.Length + Sepal.Length, data = iris)
+#summary(fit)
+output <- capture.output(stargazer(fit.1, fit.2, title = 'Regression Results', 	summary=FALSE, header=FALSE))
+cat(output)
+```
+	
+9. Include the references using bibliography.bib
+

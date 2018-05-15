@@ -1,0 +1,62 @@
+---
+title: "GIT"
+author: "Fabian Schroeder"
+date: "May 15, 2018"
+output: html_document
+---
+
+
+## Version Control I
+
+![](version_control.gif)
+
+## Version Control II
+
+Version control becomes a LOT MORE DIFFICULT if more people are involved!
+
+
+## What is Git?
+
+![](gitlogo.png){width=150px}
+
+Git is a version control system, originally developed by Linus Torvalds. Its original purpose was to help groups of developers work collaboratively on big software projects. Git manages the evolution of a set of files – called a repository – in a sane, highly structured way.
+
+
+
+## What is GitHub?
+![](githublogo.png){width=150px}  
+
+GitHub (like Bitbucket or Gitlab) is a hosting service for git-based projects. They add nice web-based interfaces to traditional Git servers. 
+
+
+## How does it work?
+
+![](git_repositories.png)
+
+
+## A typical workflow
+
+![](gitflow.png)
+
+
+## Good Resources
+
+[http://happygitwithr.com/](http://happygitwithr.com/)  (by Jenny Bryan)   
+
+[http://r-pkgs.had.co.nz/git.html](http://r-pkgs.had.co.nz/git.html) (by Hadley Wickham)
+
+## Git for the Data Scientist?
+
+Let us do an example!
+
+1. Create a new gitHub repository and upload our iris data set project.
+2. Clone the repository on a local computer
+3. Pull, modify, commit and push!
+
+## References
+
+
+
+
+
+
