@@ -1,0 +1,212 @@
+---
+title: "Predictive Modeling with the caret Package"
+author: "Fabian Schroeder"
+date: "June 12, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Resources for the `caret` package
+
+* The official resource of the package
+[http://topepo.github.io/caret/index.html](http://topepo.github.io/caret/index.html)
+
+* Package documentation
+[https://www.rdocumentation.org/packages/caret/versions/6.0-80](https://www.rdocumentation.org/packages/caret/versions/6.0-80)
+
+* A short introduction to the package
+[https://cran.r-project.org/web/packages/caret/vignettes/caret.html](https://cran.r-project.org/web/packages/caret/vignettes/caret.html)
+
+* Paper in the Journal of Statistical Software
+[https://www.jstatsoft.org/article/view/v028i05](https://www.jstatsoft.org/article/view/v028i05)
+
+
+### Model Function Consistency
+
+Since R contains many modeling packages written by different people, there
+are some inconsistencies in how models are specified and predictions are
+made. For example, many models have only one method of specifying the model
+(e.g. formula method only). These function also often require different arguments to perform the same tasks, predict probabilites, tune the model parameters by resampling etc. Let us have a look at how to generate the class probabilites using different packages.
+
+<center>![](/home/Fabian2/Desktop/StatComp/figures/ss_01.png){width=60%}</center>
+
+<center>![](/home/Fabian2/Desktop/StatComp/figures/ss_02.png){width=60%}</center>
+
+Thus, the `caret` package was developed to:
+
+ * create a unified interface for modeling and prediction (interfaces to more than 200 models)
+ * streamline model tuning using resampling
+ * provide a variety of “helper” functions and classes for day–to–day model building tasks
+ * increase computational efficiency using parallel processing
+ 
+ 
+### R Modeling Conventions
+ 
+There are two main conventions for specifying models in R: the formula interface and the non–formula (or “matrix”) interface. Note that not all R functions have both interfaces.
+ 
+#### The Formula interface
+ 
+For the former, the predictors are explicitly listed in an R formula that
+looks like: ```outcome ~ var1 + var2 + ... .```
+
+For example, the formula
+```modelFunction(price ~ numBedrooms + numBaths + acres, data = housingData) ```
+would predict the closing price of a house using three quantitative
+characteristics.
+ 
+The shortcut ```y ~. ``` can be used to indicate that all of the columns in the data set (except y) should be used as a predictor.
+
+The formula interface has many conveniences. For example, transformations, such as ```log(acres)``` can be specified in–line.
+It also autmatically converts factor predictors into dummy variables (using a less than full rank encoding). For some R functions (e.g.
+`klaR:::NaiveBayes`, `rpart:::rpart`, `C50:::C5.0`, . . . ), predictors are kept as factors.
+
+#### The Matrix or Non-Formula Interface
+
+The non–formula interface specifies the predictors for the model using a
+matrix or data frame (all the predictors in the object are used in the
+model). The outcome data are usually passed into the model as a vector object.
+For example:
+
+```modelFunction(x = housePredictors, y = price)```
+
+In this case, transformations of data or dummy variables must be created prior to being passed to the function.
+
+
+### Building and Predicting Models
+
+Modeling in R generally follows the same workflow:
+
+1. Create the model using the basic function:
+```fit <- knn(trainingData, outcome, k = 5)```
+
+2. Assess the properties of the model using `print`, `plot`, `summary` or
+other methods
+
+3. Predict outcomes for samples using the predict method:
+```predict(fit, newSamples)```
+
+The model can be used for prediction without changing the original model
+object.
+
+
+
+
+### Pre–Processing the Data
+
+There are a wide variety of models in R. Some models have different assumptions on the predictor data and may need to be pre–processed.
+For example, methods that use the inverse of the predictor cross–product matrix (i.e. $(X'X)^{-1}$ ) may require the elimination of collinear predictors.
+Others may need the predictors to be centered and/or scaled, etc.
+If any data processing is required, it is a good idea to base these calculations on the training set, then apply them to any data set used for model building or prediction.
+
+Examples of of pre–processing operations:
+
+* centering and scaling
+* imputation of missing data
+* transformations of individual predictors (e.g. Box–Cox transformations of the predictors)
+* transformations of the groups of predictors, such as the
+
+
+```preProcessValues(x = trainX, method = c("center", "scale")) ```
+
+The `method` argument understands the following values:  `"BoxCox"` , `"YeoJohnson"`, `"center"`, `"scale"`, `"range"`, `"knnImpute"`, `"bagImpute"`, `"pca"`, `"ica"` and `"spatialSign"`.
+
+To get honest estimates of performance, all data transformations should be included within the cross–validation loop. The would be especially true for feature selection as well as pre–processing techniques (e.g. imputation, PCA, etc). One function considered later called `train` that can apply preProcess within resampling loops.
+
+
+### Over-fitting and Resampling
+
+Over–fitting occurs when a model inappropriately picks up on trends in the
+training set that do not generalize to new samples. When this occurs, assessments of the model based on the training set can
+show good performance that does not reproduce in future samples.
+
+Some models have specific “knobs” to control over-fitting
+
+* neighborhood size in nearest neighbor models is an example
+
+* the number of splits in a tree model.
+
+Often, poor choices for these parameters can result in over-fitting. One obvious way to detect over–fitting is to use a test set. However, repeated “looks” at the test set can also lead to over–fitting. Resampling the training samples allows us to know when we are making poor choices for the values of these parameters (the test set is not used).
+
+#### K –Fold Cross–Validation
+
+Here, we randomly split the data into K distinct blocks of roughly equal
+size.
+
+1. We leave out the first block of data and fit a model.
+2. This model is used to predict the held-out block
+3. We continue this process until we’ve predicted all K held–out blocks
+
+The final performance is based on the hold-out predictions
+K is usually taken to be 5 or 10 and leave one out cross–validation has
+each sample as a block. Repeated K –fold CV creates multiple versions of the folds and
+aggregates the results `caret:::createFolds`, `caret:::createMultiFolds`.
+
+<center>![](/home/Fabian2/Desktop/StatComp/figures/ss_03.png){width=60%}</center>
+
+
+#### Bootstrapping
+
+Bootstrapping takes a random sample with replacement. The random
+sample is the same size as the original data set.
+Samples may be selected more than once and each sample has a 63.2%
+chance of showing up at least once.
+Some samples won’t be selected and these samples will be used to predict
+performance.
+The process is repeated multiple times (say 30–100).
+This procedure also has low variance but non–zero bias when compared to
+K –fold CV. You can either use the `sample` function or `caret:::createResample`.
+
+<center>![](/home/Fabian2/Desktop/StatComp/figures/ss_04.png){width=60%}</center>
+
+### Fitting a model
+
+There is one single function to train models in the `caret` package. The basic syntax is:
+
+``` train(formula, data, method) ```
+
+e.g for fitting a random decision tree
+
+``` train(Class ~ ., data = training, method = "rpart")```
+
+By default, the function will tune over 3 values of the tuning parameter. The tuning parameter depends on the model. 
+For the `rpart` model this is $C_p$, a complexity parameter. The default resampling scheme is the bootstrap. Let’s use repeated
+10–fold cross–validation instead.
+To do this, there is a control function that handles some of the optional
+arguments. To use three repeats of 10–fold cross–validation, we would use
+
+```{r eval = FALSE} 
+cvCtrl <- trainControl(method = "repeatedcv", repeats = 3)
+train(Class ~ ., data = training, method = "rpart", tuneLength = 30, trControl = cvCtrl)
+```
+
+The main methods of interest for the `train` object are:
+
+* `plot.train` can be used to plot the resampling profiles across the different models
+* `print.train` shows a textual description of the results
+* `predict.train` can be used to predict new samples
+
+Additionally, the final model fit (i.e. the model with the best resampling
+results) is in a sub–object called `finalModel`.
+
+
+## Parallel Processing
+
+Since we are fitting a lot of independent models over different tuning
+parameters and sampled data sets, there is no reason to do these
+sequentially. R has many facilities for splitting computations up onto multiple cores or
+machines. See Schmidberger et al (2009) for a recent review of these methods.
+
+Schmidberger M et al (2009). “State-of-the-art in Parallel Computing with
+R.” Journal of Statistical Software 47.1.
+
+To loop through the models and data sets, caret uses the `foreach`
+package, which parallelizes `for` loops.
+
+
+
+
+
+
